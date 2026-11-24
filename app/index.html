@@ -1,0 +1,955 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bizzy Bee Hive</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A clickable prototype of the hive app: what an owner sees when Bizzy Bee's AI employees are on shift. Sample data for a sample roofing company.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* The hive app, as a clickable prototype. Same stage as the website: ink,
+   honey for what needs attention, Bricolage for numbers and titles, Geist
+   for reading, Geist Mono for labels. All data is sample data. */
+:root {
+  --ink: #0B0B0F; --ink-2: #121218; --ink-3: #1A1A22; --ink-4: #22222C;
+  --line: #24242E; --line-2: #33333F;
+  --fg: #F6F3EC; --fg-2: #ABA8B2; --fg-3: #8C8994;
+  --honey: #FFB81C; --honey-hi: #FFC94D; --honey-soft: #FFE08A; --honey-deep: #2A1F05; --on-honey: #0B0B0F;
+  --ok: #5BD69A; --ok-soft: rgba(91, 214, 154, .12); --no: #FF8A80; --no-soft: rgba(255, 138, 128, .12);
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Geist", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "Geist Mono", ui-monospace, Consolas, monospace;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --side: 248px;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--ink); color: var(--fg); font: 400 15px/1.5 var(--f-body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+button { font: inherit; color: inherit; }
+a { color: inherit; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--honey); outline-offset: 2px; border-radius: 8px; }
+h1, h2, h3 { margin: 0; font-family: var(--f-display); font-weight: 800; letter-spacing: -0.035em; line-height: 1.05; }
+p { margin: 0; }
+.mono { font: 500 .72rem/1.4 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3); }
+.tab { font-variant-numeric: tabular-nums; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+svg.i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.av { --s: 30px; width: var(--s); height: calc(var(--s) * 1.1547); flex: none; display: inline-grid; place-items: center; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: var(--honey); color: var(--on-honey); font: 800 calc(var(--s) * .45)/1 var(--f-display); }
+.av.dim { background: var(--ink-4); color: var(--fg-2); }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: .75rem; font-weight: 600; background: var(--ink-4); color: var(--fg-2); white-space: nowrap; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.warn { background: var(--honey-deep); color: var(--honey); }
+.pill.no { background: var(--no-soft); color: var(--no); }
+.pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid transparent; font: 600 .875rem/1 var(--f-body); cursor: pointer; text-decoration: none; transition: background-color .2s, border-color .2s, transform .2s var(--ease); white-space: nowrap; }
+.btn:hover { transform: translateY(-1px); }
+.btn-honey { background: var(--honey); color: var(--on-honey); }
+.btn-honey:hover { background: var(--honey-hi); }
+.btn-ghost { border-color: var(--line-2); background: transparent; }
+.btn-ghost:hover { border-color: var(--fg-3); }
+.btn-sm { min-height: 32px; padding: 0 12px; font-size: .8rem; }
+.sw { width: 40px; height: 24px; border-radius: 24px; background: var(--line-2); border: 0; padding: 0; position: relative; cursor: pointer; transition: background-color .25s; flex: none; }
+.sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--fg); transition: transform .3s var(--ease); }
+.sw[aria-checked="true"] { background: var(--honey); }
+.sw[aria-checked="true"]::after { transform: translateX(16px); background: var(--ink); }
+
+/* demo strip */
+.strip { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; padding: 7px 16px; background: var(--honey); color: var(--on-honey); font: 600 .78rem/1.3 var(--f-body); text-align: center; }
+.strip a { color: inherit; }
+.strip .x { font: 500 .7rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
+
+/* shell */
+.shell { display: grid; grid-template-columns: var(--side) minmax(0, 1fr); min-height: calc(100vh - 32px); }
+.side { position: sticky; top: 32px; height: calc(100vh - 32px); border-right: 1px solid var(--line); padding: 20px 14px; display: flex; flex-direction: column; gap: 18px; background: var(--ink); overflow-y: auto; }
+.side .logo { padding: 2px 10px; }
+.side .logo svg { height: 26px; width: auto; display: block; overflow: visible; }
+.biz { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 14px; background: var(--ink-2); border: 1px solid var(--line); }
+.biz .ph { width: 32px; height: 32px; border-radius: 10px; background: #2b2216; color: var(--honey); display: grid; place-items: center; font: 800 .85rem/1 var(--f-display); }
+.biz b { display: block; font-weight: 600; font-size: .9rem; }
+.biz small { color: var(--fg-3); font-size: .75rem; }
+.nav { display: grid; gap: 2px; }
+.nav a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; text-decoration: none; color: var(--fg-2); font-weight: 500; transition: background-color .2s, color .2s; }
+.nav a:hover { background: var(--ink-2); color: var(--fg); }
+.nav a.on { background: var(--ink-3); color: var(--fg); }
+.nav a .ct { margin-left: auto; font: 600 .7rem/1 var(--f-body); padding: 4px 7px; border-radius: 999px; background: var(--honey); color: var(--on-honey); }
+.nav a .ct.dim { background: var(--ink-4); color: var(--fg-2); }
+.keeper { margin-top: auto; padding: 14px; border-radius: 16px; background: var(--ink-2); border: 1px solid var(--line); display: grid; gap: 10px; }
+.keeper .who { display: flex; align-items: center; gap: 10px; }
+.keeper .face { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #3a3a46, #1c1c24); display: grid; place-items: center; font: 600 .8rem/1 var(--f-body); color: var(--fg-2); }
+.keeper b { display: block; font-size: .875rem; }
+.keeper small { color: var(--fg-3); font-size: .75rem; }
+.main { min-width: 0; display: flex; flex-direction: column; }
+.top { position: sticky; top: 32px; z-index: 30; display: flex; align-items: center; gap: 12px; padding: 14px clamp(16px, 3vw, 32px); background: rgba(11, 11, 15, .85); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+.top h1 { font-size: 1.35rem; letter-spacing: -0.03em; }
+.top .sp { flex: 1; }
+.search { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--ink-2); color: var(--fg-3); min-width: 220px; }
+.search input { background: none; border: 0; color: var(--fg); font: inherit; width: 100%; outline: none; }
+.mlogo { display: none; }
+.content { padding: clamp(18px, 3vw, 32px); display: grid; gap: 18px; align-content: start; max-width: 1240px; width: 100%; }
+.tabbar { display: none; }
+@media (max-width: 860px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .side { display: none; }
+  .mlogo { display: block; }
+  .mlogo svg { height: 22px; width: auto; display: block; overflow: visible; }
+  .top h1 { display: none; }
+  .search { display: none; }
+  .content { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+  .tabbar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); position: fixed; left: 0; right: 0; bottom: 0; z-index: 35; background: rgba(11, 11, 15, .94); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-top: 1px solid var(--line); padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px)); }
+  .tabbar a { display: grid; justify-items: center; gap: 3px; padding: 6px 2px; text-decoration: none; color: var(--fg-3); font-size: .68rem; font-weight: 500; position: relative; }
+  .tabbar a.on { color: var(--honey); }
+  .tabbar a .ct { position: absolute; top: 2px; left: calc(50% + 6px); min-width: 16px; height: 16px; border-radius: 8px; background: var(--honey); color: var(--on-honey); font: 700 .62rem/16px var(--f-body); text-align: center; padding: 0 4px; }
+}
+
+/* cards & bits */
+.card { background: var(--ink-2); border: 1px solid var(--line); border-radius: 22px; padding: 20px; min-width: 0; }
+.card > h2, .card .ch { font-size: 1.15rem; letter-spacing: -0.02em; }
+.ch-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.split { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 1100px) { .split { grid-template-columns: minmax(0, 1fr); } .grid3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .grid2, .grid3 { grid-template-columns: minmax(0, 1fr); } }
+.hello { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.hello h2 { font-size: clamp(1.9rem, 1.4rem + 1.8vw, 2.8rem); }
+.hello h2 em { font-style: normal; color: var(--honey); }
+.hello p { color: var(--fg-2); margin-top: 6px; }
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.kpi { background: var(--ink-2); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; display: grid; gap: 4px; text-align: left; }
+.kpi span { color: var(--fg-3); font-size: .8rem; }
+.kpi b { font: 800 clamp(1.7rem, 1.3rem + 1.2vw, 2.3rem)/1.05 var(--f-display); letter-spacing: -0.04em; }
+.kpi small { color: var(--fg-3); font-size: .78rem; }
+.kpi small .up { color: var(--ok); }
+.kpi.need { background: var(--honey); border-color: var(--honey); color: var(--on-honey); cursor: pointer; }
+.kpi.need span, .kpi.need small { color: rgba(11, 11, 15, .72); }
+.kpi.bump b { animation: bump .6s var(--ease); }
+@keyframes bump { 0% { transform: none; } 30% { transform: translateY(-3px); color: var(--honey); } 100% { transform: none; } }
+.list { display: grid; gap: 8px; }
+.need-item { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; padding: 14px; border-radius: 16px; background: var(--ink); border: 1px solid var(--line); }
+.need-item .av { --s: 32px; }
+.need-item b { font-weight: 600; }
+.need-item p { color: var(--fg-2); font-size: .9rem; margin-top: 2px; }
+.need-item .quote { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: var(--ink-3); color: var(--fg-2); font-size: .88rem; }
+.need-item .draft { margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: var(--honey); color: var(--on-honey); font-size: .88rem; font-weight: 500; }
+.need-item .acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.need-item.out { animation: out .4s var(--ease) forwards; }
+@keyframes out { to { opacity: 0; transform: translateX(16px); } }
+.empty { padding: 26px; text-align: center; color: var(--fg-3); border: 1px dashed var(--line-2); border-radius: 16px; }
+.empty b { display: block; color: var(--fg); font-family: var(--f-display); font-size: 1.2rem; letter-spacing: -0.02em; margin-bottom: 4px; }
+.feed { display: grid; }
+.ev { display: grid; grid-template-columns: 64px auto minmax(0, 1fr); gap: 12px; align-items: start; padding: 11px 4px; border-bottom: 1px solid var(--line); text-decoration: none; }
+.ev:last-child { border-bottom: 0; }
+.ev time { font: 500 .75rem/1.9 var(--f-mono); color: var(--fg-3); }
+.ev .av { --s: 24px; margin-top: 1px; }
+.ev p { font-size: .9rem; color: var(--fg-2); }
+.ev p b { color: var(--fg); font-weight: 600; }
+.ev.new { animation: newev 1.6s var(--ease); }
+@keyframes newev { 0% { background: rgba(255, 184, 28, .14); } 100% { background: transparent; } }
+a.ev:hover p b { color: var(--honey); }
+.livetag { display: inline-flex; align-items: center; gap: 7px; }
+.livetag i { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 rgba(91, 214, 154, .6); animation: live 2s infinite; }
+@keyframes live { 0% { box-shadow: 0 0 0 0 rgba(91, 214, 154, .55); } 80%, 100% { box-shadow: 0 0 0 8px rgba(91, 214, 154, 0); } }
+.beerow { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 4px; border-bottom: 1px solid var(--line); text-decoration: none; }
+.beerow:last-child { border-bottom: 0; }
+.beerow .av { --s: 30px; }
+.beerow b { font-weight: 600; }
+.beerow small { display: block; color: var(--fg-3); font-size: .8rem; }
+
+/* charts: single series, thin columns, 4px rounded caps, 1px recessive grid */
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart .grid line { stroke: var(--line); stroke-width: 1; }
+.chart .ax text { fill: var(--fg-3); font: 500 11px var(--f-mono); }
+.chart .bar { fill: var(--honey); transition: opacity .2s; }
+.chart .bar.dim { fill: #6b5520; }
+.chart .hit { fill: transparent; cursor: pointer; }
+.chart .hit:hover + .bar, .chart .hit:focus + .bar { opacity: .75; }
+.chart .val { fill: var(--fg); font: 600 12px var(--f-body); }
+.tip { position: fixed; z-index: 80; pointer-events: none; background: var(--ink-4); border: 1px solid var(--line-2); border-radius: 12px; padding: 8px 12px; box-shadow: 0 16px 40px -16px rgba(0,0,0,.9); font-size: .82rem; transform: translate(-50%, calc(-100% - 12px)); }
+.tip b { display: block; font: 800 1.05rem/1.1 var(--f-display); letter-spacing: -0.02em; }
+.tip span { color: var(--fg-3); }
+
+/* inbox */
+.filters { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.chipb { border: 1px solid var(--line-2); background: transparent; border-radius: 999px; padding: 7px 12px; font-size: .82rem; font-weight: 500; color: var(--fg-2); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: border-color .2s, color .2s, background-color .2s; }
+.chipb:hover { color: var(--fg); border-color: var(--fg-3); }
+.chipb[aria-pressed="true"] { background: var(--fg); color: var(--ink); border-color: var(--fg); }
+.chipb .av { --s: 16px; }
+.inbox { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 18px; align-items: start; }
+@media (max-width: 1100px) { .inbox { grid-template-columns: minmax(0, 1fr); } .inbox.has-open .ilist { display: none; } }
+.ilist { display: grid; gap: 6px; }
+.irow { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 12px 14px; border-radius: 16px; background: var(--ink-2); border: 1px solid var(--line); text-decoration: none; transition: border-color .2s, background-color .2s; }
+.irow:hover { border-color: var(--line-2); }
+.irow.on { border-color: var(--honey); background: #19150b; }
+.irow .av { --s: 30px; }
+.irow b { font-weight: 600; }
+.irow .pv { color: var(--fg-2); font-size: .86rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.irow .meta { display: grid; justify-items: end; gap: 6px; }
+.irow time { color: var(--fg-3); font-size: .76rem; white-space: nowrap; }
+.convo { position: sticky; top: 104px; display: grid; gap: 14px; }
+.convo .hd { display: flex; align-items: flex-start; gap: 12px; }
+.convo .hd .ic { width: 40px; height: 40px; border-radius: 50%; background: var(--honey-deep); color: var(--honey); display: grid; place-items: center; flex: none; }
+.convo .hd b { font-size: 1.05rem; }
+.convo .hd small { display: block; color: var(--fg-3); font-size: .82rem; }
+.back { display: none; }
+@media (max-width: 1100px) { .back { display: inline-flex; } .convo { position: static; } }
+.thread { display: flex; flex-direction: column; gap: 8px; padding: 6px 0; }
+.m { max-width: 86%; padding: 10px 13px; border-radius: 16px; font-size: .9rem; line-height: 1.45; overflow-wrap: anywhere; }
+.m.them { align-self: flex-start; background: var(--ink-4); border-bottom-left-radius: 5px; }
+.m.bee { align-self: flex-end; background: var(--honey); color: var(--on-honey); border-bottom-right-radius: 5px; font-weight: 500; }
+.m.sys { align-self: center; background: none; padding: 0; font: 500 .7rem/1.4 var(--f-mono); letter-spacing: .07em; text-transform: uppercase; color: var(--fg-3); text-align: center; }
+.m.res { align-self: stretch; max-width: none; background: var(--ok-soft); color: var(--ok); border: 1px solid rgba(91, 214, 154, .25); font-weight: 600; }
+.m.hand { align-self: stretch; max-width: none; background: var(--honey-deep); color: var(--honey-soft); border: 1px solid rgba(255, 184, 28, .25); font-weight: 500; }
+.m.draft { align-self: flex-end; background: transparent; border: 1.5px dashed var(--honey); color: var(--honey-soft); }
+.m small { display: block; font: 500 .66rem/1.3 var(--f-mono); letter-spacing: .07em; text-transform: uppercase; opacity: .7; margin-bottom: 4px; }
+.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 16px; font-size: .88rem; }
+.facts dt { color: var(--fg-3); }
+.facts dd { margin: 0; }
+.acts { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* shift log */
+.day-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 8px 0 4px; }
+.day-h h2 { font-size: 1.1rem; letter-spacing: -0.02em; }
+
+/* bees */
+.bees { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 1100px) { .bees { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .bees { grid-template-columns: minmax(0, 1fr); } }
+.beec { display: grid; gap: 14px; padding: 18px; border-radius: 22px; background: var(--ink-2); border: 1px solid var(--line); text-decoration: none; transition: border-color .2s, transform .3s var(--ease); }
+.beec:hover { border-color: var(--line-2); transform: translateY(-2px); }
+.beec .tp { display: flex; align-items: center; gap: 12px; }
+.beec .tp .av { --s: 40px; }
+.beec h3 { font-size: 1.5rem; }
+.beec .job { font: 500 .7rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3); margin-top: 4px; display: block; }
+.beec .tp .pill { margin-left: auto; }
+.beec .num { display: flex; align-items: baseline; gap: 8px; }
+.beec .num b { font: 800 1.9rem/1 var(--f-display); letter-spacing: -0.04em; }
+.beec .num span { color: var(--fg-3); font-size: .82rem; }
+.beec.off { opacity: .72; }
+.beehead { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px; align-items: center; }
+.beehead .av { --s: 64px; }
+.beehead h2 { font-size: clamp(2rem, 1.5rem + 1.6vw, 2.8rem); }
+.beehead p { color: var(--fg-2); margin-top: 4px; }
+@media (max-width: 640px) { .beehead { grid-template-columns: auto minmax(0, 1fr); } .beehead .ctl { grid-column: 1 / -1; } }
+.ctl { display: flex; align-items: center; gap: 10px; }
+details.pb { border-top: 1px solid var(--line); }
+details.pb:first-of-type { border-top: 0; }
+details.pb summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 0; font-weight: 600; }
+details.pb summary::-webkit-details-marker { display: none; }
+details.pb summary::after { content: "+"; font: 400 1.3rem/1 var(--f-body); color: var(--fg-3); }
+details.pb[open] summary::after { content: "\2212"; }
+details.pb .bd { padding: 0 0 16px; color: var(--fg-2); font-size: .9rem; display: grid; gap: 8px; }
+details.pb .bd .li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+details.pb .bd .li:last-child { border-bottom: 0; }
+details.pb .bd .li b { color: var(--fg); font-weight: 500; }
+textarea.req { width: 100%; min-height: 84px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line-2); background: var(--ink); color: var(--fg); font: inherit; resize: vertical; }
+textarea.req:focus, .addrule input:focus { outline: none; border-color: var(--honey); }
+
+/* rules */
+.rule { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 13px 0; border-top: 1px solid var(--line); }
+.rule:first-of-type { border-top: 0; }
+.rule p { font-size: .92rem; }
+.rule small { display: block; color: var(--fg-3); font-size: .78rem; margin-top: 2px; }
+.addrule { display: flex; gap: 8px; margin-top: 10px; }
+.addrule input { flex: 1; min-width: 0; height: 42px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--ink); color: var(--fg); font: inherit; }
+
+/* reports */
+.wk { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 16px 18px; border-radius: 18px; background: var(--ink-2); border: 1px solid var(--line); text-decoration: none; transition: border-color .2s; }
+.wk:hover { border-color: var(--honey); }
+.wk b { font: 800 1.15rem/1.2 var(--f-display); letter-spacing: -0.02em; }
+.wk small { display: block; color: var(--fg-3); font-size: .82rem; margin-top: 2px; }
+.wk .nums { display: flex; gap: 18px; color: var(--fg-2); font-size: .85rem; }
+.wk .nums b { font-size: 1.05rem; display: block; color: var(--fg); }
+@media (max-width: 640px) { .wk .nums { display: none; } }
+.email { max-width: 760px; background: var(--ink-2); border: 1px solid var(--line-2); border-radius: 26px; overflow: hidden; }
+.email .eh { padding: 20px 24px; border-bottom: 1px solid var(--line); display: grid; gap: 4px; }
+.email .eh b { font-weight: 600; }
+.email .eh small { color: var(--fg-3); }
+.email .eb { padding: 24px; display: grid; gap: 22px; }
+.email .big { font: 800 clamp(1.9rem, 1.4rem + 1.6vw, 2.6rem)/1.08 var(--f-display); letter-spacing: -0.04em; }
+.email .big em { font-style: normal; color: var(--honey); }
+.email .beesec { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; padding: 14px 0; border-top: 1px solid var(--line); }
+.email .beesec .av { --s: 34px; grid-row: span 2; }
+.email .beesec b { font-weight: 600; }
+.email .beesec p { color: var(--fg-2); font-size: .9rem; }
+.email .needs { border-radius: 16px; background: var(--honey-deep); padding: 14px 16px; color: var(--honey-soft); font-size: .92rem; }
+.email .needs b { color: var(--honey); }
+
+/* settings */
+.set-row { display: grid; grid-template-columns: 180px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 13px 0; border-top: 1px solid var(--line); font-size: .92rem; }
+.set-row:first-of-type { border-top: 0; }
+.set-row span { color: var(--fg-3); }
+@media (max-width: 640px) { .set-row { grid-template-columns: minmax(0, 1fr) auto; } .set-row span { grid-column: 1 / -1; } }
+
+/* ask the hive */
+.ask { position: fixed; z-index: 70; right: 16px; bottom: 16px; top: 48px; width: min(420px, calc(100vw - 32px)); display: flex; flex-direction: column; background: var(--ink-2); border: 1px solid var(--line-2); border-radius: 24px; box-shadow: 0 40px 80px -30px rgba(0,0,0,.95); transform: translateX(calc(100% + 24px)); transition: transform .45s var(--ease); }
+.ask.on { transform: none; }
+@media (max-width: 860px) { .ask { top: 40px; bottom: calc(70px + env(safe-area-inset-bottom, 0px)); right: 8px; width: calc(100vw - 16px); } }
+.ask .ah { display: flex; align-items: center; gap: 10px; padding: 16px 16px 12px 18px; border-bottom: 1px solid var(--line); }
+.ask .ah b { font: 800 1.15rem/1 var(--f-display); letter-spacing: -0.02em; }
+.ask .ah button { margin-left: auto; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line-2); background: transparent; cursor: pointer; display: grid; place-items: center; }
+.ask .body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.ask .a { align-self: flex-start; max-width: 92%; background: var(--ink-3); border-radius: 16px 16px 16px 5px; padding: 11px 14px; font-size: .9rem; white-space: pre-wrap; }
+.ask .q { align-self: flex-end; max-width: 86%; background: var(--honey); color: var(--on-honey); border-radius: 16px 16px 5px 16px; padding: 10px 14px; font-size: .9rem; font-weight: 500; }
+.ask .t { align-self: center; font: 500 .68rem/1.3 var(--f-mono); letter-spacing: .07em; text-transform: uppercase; color: var(--fg-3); }
+.ask .sugg { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 10px; }
+.ask .sugg button { border: 1px solid var(--line-2); background: var(--ink); border-radius: 999px; padding: 7px 11px; font-size: .78rem; cursor: pointer; text-align: left; }
+.ask .sugg button:hover { border-color: var(--honey); }
+.ask form { display: flex; gap: 8px; padding: 12px 14px 14px; border-top: 1px solid var(--line); }
+.ask input { flex: 1; min-width: 0; height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--ink); color: var(--fg); font: inherit; }
+.ask input:focus { outline: none; border-color: var(--honey); }
+.ask .send { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--honey); color: var(--on-honey); cursor: pointer; display: grid; place-items: center; flex: none; }
+.ask .send[disabled] { opacity: .45; }
+.ask .note { padding: 0 16px 12px; color: var(--fg-3); font-size: .74rem; }
+.dots { display: inline-flex; gap: 4px; }
+.dots i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .5; animation: dot 1s infinite; }
+.dots i:nth-child(2) { animation-delay: .15s; } .dots i:nth-child(3) { animation-delay: .3s; }
+@keyframes dot { 0%, 100% { transform: none; opacity: .4; } 50% { transform: translateY(-3px); opacity: 1; } }
+
+.toast { position: fixed; z-index: 90; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; background: var(--fg); color: var(--ink); padding: 11px 18px; border-radius: 999px; font-weight: 600; font-size: .88rem; box-shadow: 0 20px 40px -20px rgba(0,0,0,.9); transition: opacity .25s, transform .35s var(--ease); pointer-events: none; max-width: calc(100vw - 32px); text-align: center; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+@media (max-width: 860px) { .toast { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); } }
+.view { animation: viewin .35s var(--ease); }
+@keyframes viewin { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="strip" role="note"><span>Sample hive app. Harper Roofing is a sample business, and everything here is sample data.</span><span class="x" id="homeLink" hidden><a href="../index.html">Back to bizzybee.thinkabstrakt.com</a></span></div>
+<div class="shell">
+  <aside class="side" aria-label="Hive navigation">
+    <div class="logo" id="logoSide"></div>
+    <div class="biz"><span class="ph">HR</span><div><b>Harper Roofing</b><small>Dallas&ndash;Fort Worth &middot; Whole hive</small></div></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="keeper"><div class="who"><span class="face">SO</span><div><b>Sam Ortiz</b><small>Your Beekeeper</small></div></div><button class="btn btn-ghost btn-sm" data-act="beekeeper">Text Sam</button></div>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <div class="mlogo" id="logoTop"></div>
+      <h1 id="title">Today</h1>
+      <span class="sp"></span>
+      <label class="search"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span class="sr">Search conversations</span><input id="q" placeholder="Search conversations"></label>
+      <button class="btn btn-honey" data-act="ask"><svg class="i" viewBox="0 0 24 24"><path d="M12 3l1.8 4.6L18 9.4l-4.2 1.8L12 16l-1.8-4.8L6 9.4l4.2-1.8z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>Ask the hive</button>
+    </header>
+    <main class="content" id="view" tabindex="-1"></main>
+  </div>
+</div>
+<nav class="tabbar" id="tabbar" aria-label="Hive navigation"></nav>
+
+<aside class="ask" id="ask" aria-label="Ask the hive" aria-hidden="true">
+  <div class="ah"><span class="av" style="--s:28px">&#10022;</span><b>Ask the hive</b><button type="button" data-act="ask-close" aria-label="Close"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="body" id="askBody"><div class="a">Ask about anything your bees did: calls, leads, bookings, invoices or reviews. I'll look it up in your shift log.</div></div>
+  <div class="sugg" id="askSugg"></div>
+  <form id="askForm" autocomplete="off"><label class="sr" for="askIn">Ask the hive</label><input id="askIn" maxlength="300" placeholder="How many jobs did Bea book this week?"><button class="send" type="submit" aria-label="Ask"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
+  <p class="note" id="askNote">Answers come from this sample shift log.</p>
+</aside>
+<div class="tip" id="tip" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+  // ------------------------------------------------------------ helpers
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var money = function (v) { return '$' + Math.round(v).toLocaleString('en-US'); };
+  var kfmt = function (v) { return v >= 10000 ? '$' + (v / 1000).toFixed(1) + 'k' : money(v); };
+  var store = { get: function (k, d) { try { var v = localStorage.getItem('bb-hive:' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set: function (k, v) { try { localStorage.setItem('bb-hive:' + k, JSON.stringify(v)); } catch (e) {} } };
+  function rng(seed) { var a = seed >>> 0; return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  var R = rng(20261122);
+  var pick = function (arr) { return arr[Math.floor(R() * arr.length)]; };
+  var ICON = {
+    today: '<path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-6h4v6"/>',
+    inbox: '<path d="M4 5h16v14H4z"/><path d="M4 13h5l1.5 2h3L15 13h5"/>',
+    log: '<path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>',
+    bees: '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/>',
+    rules: '<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
+    reports: '<path d="M5 20V10M12 20V4M19 20v-7"/>',
+    settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.6 1.6 0 00-1-1.5 1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H3a2 2 0 110-4h.1a1.6 1.6 0 001.5-1 1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3h.1a1.6 1.6 0 001-1.5V3a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8v.1a1.6 1.6 0 001.5 1H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/>',
+    call: '<path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A15 15 0 013 6a2 2 0 012-2z"/>',
+    text: '<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/>',
+    chat: '<path d="M4 5h16v11H9l-5 4z"/>',
+    email: '<path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/>',
+    review: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+    more: '<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>'
+  };
+  ICON.account = ICON.settings;
+  var icon = function (k) { return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + ICON[k] + '</svg>'; };
+  var tipEl = $('#tip'), toastEl = $('#toast'), toastT = null;
+  function toast(msg) { toastEl.textContent = msg; toastEl.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove('on'); }, 2600); }
+
+  // ------------------------------------------------------------ logo
+  var LOCKUP = '<svg viewBox="0 0 5177.1 1264.3" aria-label="Bizzy Bee" role="img"><path style="fill:var(--honey)" d="M122 190.9L406.7 190.9C539.4 190.9 646.9 298.4 646.9 431.1C646.9 475.6 634.8 517.4 613.6 553.2C765.9 556.4 888.4 680.9 888.4 834C888.4 989.1 762.7 1114.9 607.5 1114.9L122 1114.9C54.6 1114.9 0 1060.2 0 992.8L0 312.9C0 245.5 54.6 190.9 122 190.9ZM258.6 865.1C231.6 865.1 209.7 887 209.7 914C209.7 941.1 231.6 963 258.6 963L703.5 963C730.5 963 752.4 941.1 752.4 914C752.4 887 730.5 865.1 703.5 865.1ZM258.6 693.5C231.6 693.5 209.7 715.4 209.7 742.5C209.7 769.5 231.6 791.4 258.6 791.4L703.5 791.4C730.5 791.4 752.4 769.5 752.4 742.5C752.4 715.4 730.5 693.5 703.5 693.5ZM223.7 340.8L223.7 544.2L376.8 544.2C433 544.2 478.5 498.7 478.5 442.5C478.5 386.4 433 340.8 376.8 340.8Z"/><path style="fill:var(--honey-soft)" d="M683.7 512Q695.2 472.7 695.2 431.1Q695.2 367.2 668.6 309.8Q644.7 258.4 603.4 220Q600.5 217.3 599.9 213.3Q599.3 209.4 601.2 205.9Q606.2 197.3 615 180.5Q639.4 134.1 654.9 115.1Q692.9 68.6 735.5 42.4Q786.8 10.8 836.6 3.3Q864.9 -1 891.5 0.3Q921.8 1.9 944.3 10.6Q968.6 20 991.2 38Q1014.3 56.3 1028 77.4Q1041.2 97.8 1048.3 127Q1054.9 153.8 1054.8 181.3Q1054.6 226.2 1027.3 286.1Q1007.6 329.3 966.1 375.8Q933.5 412.2 883.6 447Q837.7 478.9 788.3 499.5Q765.5 508.9 714.8 521.8Q705 524.3 697.6 526.3Q693.1 527.5 689 525.1Q684.9 522.7 683.7 518.1Q682.8 515.1 683.7 512Z"/><path style="fill:var(--fg)" d="M1086.4 1108.3L1086.4 448.3L1352.4 448.3Q1413.4 448.3 1460.9 459.3Q1508.4 470.3 1541.9 491.8Q1575.4 513.3 1592.9 545.3Q1610.4 577.3 1610.4 620.3Q1610.4 660.3 1593.9 692.3Q1577.4 724.3 1540.9 743.8Q1504.4 763.3 1445.4 768.3L1445.4 777.3Q1546.4 782.3 1591.9 824.3Q1637.4 866.3 1637.4 935.3Q1637.4 993.3 1607.4 1031.3Q1577.4 1069.3 1519.9 1088.8Q1462.4 1108.3 1377.4 1108.3ZM3576.4 1108.3L3576.4 448.3L3842.4 448.3Q3903.4 448.3 3950.9 459.3Q3998.4 470.3 4031.9 491.8Q4065.4 513.3 4082.9 545.3Q4100.4 577.3 4100.4 620.3Q4100.4 660.3 4083.9 692.3Q4067.4 724.3 4030.9 743.8Q3994.4 763.3 3935.4 768.3L3935.4 777.3Q4036.4 782.3 4081.9 824.3Q4127.4 866.3 4127.4 935.3Q4127.4 993.3 4097.4 1031.3Q4067.4 1069.3 4009.9 1088.8Q3952.4 1108.3 3867.4 1108.3ZM3043.4 1264.3Q3013.4 1264.3 2977.4 1259.3Q2941.4 1254.3 2905.4 1243.3Q2869.4 1232.3 2838.4 1215.3L2875.4 1052.3Q2911.4 1086.3 2955.9 1100.3Q3000.4 1114.3 3035.4 1114.3Q3084.4 1114.3 3117.9 1094.8Q3151.4 1075.3 3168.4 1037.8Q3185.4 1000.3 3185.4 946.3L3185.4 854.3L3176.4 854.3Q3174.4 924.3 3153.9 968.8Q3133.4 1013.3 3098.4 1034.3Q3063.4 1055.3 3017.4 1055.3Q2960.4 1055.3 2922.9 1026.3Q2885.4 997.3 2866.4 939.3Q2847.4 881.3 2847.4 794.3L2847.4 580.3L3008.4 580.3L3008.4 752.3Q3008.4 837.3 3026.4 876.3Q3044.4 915.3 3083.4 915.3Q3103.4 915.3 3118.9 904.8Q3134.4 894.3 3144.4 872.8Q3154.4 851.3 3159.4 818.8Q3164.4 786.3 3164.4 743.3L3164.4 580.3L3325.4 580.3L3325.4 952.3Q3325.4 1006.3 3314.4 1053.8Q3303.4 1101.3 3281.4 1139.8Q3259.4 1178.3 3225.9 1206.3Q3192.4 1234.3 3146.9 1249.3Q3101.4 1264.3 3043.4 1264.3ZM4419.4 1122.3Q4344.4 1122.3 4293.9 1100.8Q4243.4 1079.3 4212.4 1041.8Q4181.4 1004.3 4167.9 956.3Q4154.4 908.3 4154.4 855.3Q4154.4 798.3 4168.9 746.3Q4183.4 694.3 4213.9 653.8Q4244.4 613.3 4292.9 589.8Q4341.4 566.3 4409.4 566.3Q4477.4 566.3 4525.9 589.8Q4574.4 613.3 4603.4 655.3Q4632.4 697.3 4640.9 752.3Q4649.4 807.3 4638.4 871.3L4311.4 876.4Q4315.5 935.3 4337.4 965.3Q4364.4 1002.3 4420.4 1002.3Q4444.4 1002.3 4460.4 996.3Q4476.4 990.3 4486.4 978.8Q4496.4 967.3 4500.4 950.8Q4504.4 934.3 4503.4 913.3L4651.4 921.3Q4654.4 954.3 4644.9 989.3Q4635.4 1024.3 4609.4 1054.3Q4583.4 1084.3 4536.9 1103.3Q4490.4 1122.3 4419.4 1122.3ZM4944.4 1122.3Q4869.4 1122.3 4818.9 1100.8Q4768.4 1079.3 4737.4 1041.8Q4706.4 1004.3 4692.9 956.3Q4679.4 908.3 4679.4 855.3Q4679.4 798.3 4693.9 746.3Q4708.4 694.3 4738.9 653.8Q4769.4 613.3 4817.9 589.8Q4866.4 566.3 4934.4 566.3Q5002.4 566.3 5050.9 589.8Q5099.4 613.3 5128.4 655.3Q5157.4 697.3 5165.9 752.3Q5174.4 807.3 5163.4 871.3L4836.4 876.4Q4840.5 935.3 4862.4 965.3Q4889.4 1002.3 4945.4 1002.3Q4969.4 1002.3 4985.4 996.3Q5001.4 990.3 5011.4 978.8Q5021.4 967.3 5025.4 950.8Q5029.4 934.3 5028.4 913.3L5176.4 921.3Q5179.4 954.3 5169.9 989.3Q5160.4 1024.3 5134.4 1054.3Q5108.4 1084.3 5061.9 1103.3Q5015.4 1122.3 4944.4 1122.3ZM1884.4 1108.3L1884.4 972.3L2135.4 716.3L2135.4 710.3L1889.4 710.3L1889.4 580.3L2324.4 580.3L2324.4 717.3L2073.4 974.3L2073.4 978.3L2327.4 978.3L2327.4 1108.3ZM2367.4 1108.3L2367.4 972.3L2618.4 716.3L2618.4 710.3L2372.4 710.3L2372.4 580.3L2807.4 580.3L2807.4 717.3L2556.4 974.3L2556.4 978.3L2810.4 978.3L2810.4 1108.3ZM1678.4 1108.3L1678.4 580.3L1840.4 580.3L1840.4 1108.3ZM1248.4 978.3L1370.4 978.3Q1421.4 978.3 1449.4 959.8Q1477.4 941.3 1477.4 907.3Q1477.4 869.3 1445.9 850.8Q1414.4 832.3 1351.4 832.3L1248.4 832.3ZM3738.4 978.3L3860.4 978.3Q3911.4 978.3 3939.4 959.8Q3967.4 941.3 3967.4 907.3Q3967.4 869.3 3935.9 850.8Q3904.4 832.3 3841.4 832.3L3738.4 832.3ZM1248.4 722.3L1335.4 722.3Q1392.4 722.3 1422.4 703.3Q1452.4 684.3 1452.4 647.3Q1452.4 612.3 1425.4 594.8Q1398.4 577.3 1344.4 577.3L1248.4 577.3ZM3738.4 722.3L3825.4 722.3Q3882.4 722.3 3912.4 703.3Q3942.4 684.3 3942.4 647.3Q3942.4 612.3 3915.4 594.8Q3888.4 577.3 3834.4 577.3L3738.4 577.3ZM1758.4 542.3Q1712.4 542.3 1687.9 522.8Q1663.4 503.3 1663.4 466.3Q1663.4 428.3 1687.9 408.8Q1712.4 389.3 1758.4 389.3Q1805.4 389.3 1829.9 409.3Q1854.4 429.3 1854.4 466.3Q1854.4 502.3 1829.9 522.3Q1805.4 542.3 1758.4 542.3ZM4314.7 788.1L4495.7 784.6Q4494.8 770.1 4491.9 757.8Q4484.4 726.3 4464.4 709.8Q4444.4 693.3 4409.4 693.3Q4372.4 693.3 4350.4 712.3Q4328.4 731.3 4319.4 765.8Q4316.7 776.3 4314.7 788.1ZM4839.7 788.1L5020.7 784.6Q5019.8 770.1 5016.9 757.8Q5009.4 726.3 4989.4 709.8Q4969.4 693.3 4934.4 693.3Q4897.4 693.3 4875.4 712.3Q4853.4 731.3 4844.4 765.8Q4841.7 776.3 4839.7 788.1Z"/></svg>';
+  $('#logoSide').innerHTML = LOCKUP; $('#logoTop').innerHTML = LOCKUP;
+  if (/\/app\/(index\.html)?$/.test(location.pathname)) $('#homeLink').hidden = false;
+
+  // ------------------------------------------------------------ sample data
+  var BEES = [
+    { id: 'bea', name: 'Bea', job: 'Front desk', ini: 'B', status: 'on', metric: 'Calls answered', unit: '', weeks: [181, 196, 204, 188, 222, 207, 214, 0] },
+    { id: 'miles', name: 'Miles', job: 'Follow-up', ini: 'M', status: 'on', metric: 'Median lead reply', unit: 's', weeks: [58, 52, 47, 49, 44, 43, 41, 0], lowGood: true },
+    { id: 'ruby', name: 'Ruby', job: 'Scheduling', ini: 'R', status: 'on', metric: 'No-show rate', unit: '%', weeks: [9, 7, 6, 4, 4, 3, 2, 0], lowGood: true },
+    { id: 'june', name: 'June', job: 'Reviews', ini: 'J', status: 'trial', metric: 'Review requests drafted', unit: '', weeks: [0, 0, 0, 0, 0, 0, 0, 0] },
+    { id: 'otis', name: 'Otis', job: 'Billing', ini: 'O', status: 'on', metric: 'Days to get paid', unit: 'd', weeks: [11.2, 9.8, 8.1, 6.5, 5.2, 4.6, 4.1, 0], lowGood: true },
+    { id: 'penny', name: 'Penny', job: 'Marketing', ini: 'P', status: 'setup', metric: 'Posts on schedule', unit: '', weeks: [0, 0, 0, 0, 0, 0, 0, 0] }
+  ];
+  var BEE = {}; BEES.forEach(function (b) { BEE[b.id] = b; });
+  var beeState = store.get('bees', {});
+  BEES.forEach(function (b) { if (beeState[b.id] === 'paused' && b.status === 'on') b.status = 'paused'; });
+
+  var FIRST = ['Mark', 'Kelly', 'Dana', 'Jorge', 'Priya', 'Tom', 'Rachel', 'Luis', 'Grace', 'Ben', 'Monica', 'Andre', 'Sofia', 'Chris', 'Hannah', 'Derek', 'Ana', 'Mike', 'Leah', 'Victor', 'Erin', 'Sam', 'Tasha', 'Paul', 'Megan', 'Omar', 'Julie', 'Ray', 'Nina', 'Carlos'];
+  var LAST = ['Henderson', 'Patel', 'Nguyen', 'Garcia', 'Brooks', 'Ward', 'Kim', 'Morales', 'Price', 'Fletcher', 'Ramos', 'Coleman', 'Shah', 'Doyle', 'Reyes', 'Bishop', 'Lawson', 'Ortiz', 'Hayes', 'Mendoza'];
+  var CITY = ['Dallas', 'Plano', 'Frisco', 'Richardson', 'Allen'];
+  var STREET = ['Elm St', 'Maple Ave', 'Preston Rd', 'Legacy Dr', 'Coit Rd', 'Mockingbird Ln', 'Ridgeview Dr', 'Spring Creek Pkwy', 'Hillcrest Rd', 'Alma Dr'];
+  function person() {
+    var f = pick(FIRST), l = pick(LAST), c = pick(CITY);
+    return { first: f, name: f + ' ' + l, short: f + ' ' + l[0] + '.', city: c, addr: (100 + Math.floor(R() * 8900)) + ' ' + pick(STREET) + ', ' + c,
+      phone: '(' + pick(['214', '469', '972']) + ') 555-01' + String(Math.floor(R() * 90) + 10) };
+  }
+
+  var NOW = new Date();
+  var DAY = 86400000;
+  var today0 = new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate()).getTime();
+  var DN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var MN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function clock(t) { var d = new Date(t), h = d.getHours(), m = d.getMinutes(); return (h % 12 || 12) + ':' + String(m).padStart(2, '0') + ' ' + (h >= 12 ? 'PM' : 'AM'); }
+  function dayLabel(t) { var d0 = new Date(t); d0.setHours(0, 0, 0, 0); var k = Math.round((today0 - d0.getTime()) / DAY); var d = new Date(t); return k === 0 ? 'Today' : k === 1 ? 'Yesterday' : DN[d.getDay()] + ', ' + MN[d.getMonth()] + ' ' + d.getDate(); }
+  function when(t) { var l = dayLabel(t); return (l === 'Today' ? '' : l + ', ') + clock(t); }
+  function slot(daysAhead, h, m) { var d = new Date(today0 + daysAhead * DAY); while (d.getDay() === 0) d = new Date(d.getTime() + DAY); return DN[d.getDay()] + ' ' + (h % 12 || 12) + ':' + String(m).padStart(2, '0') + ' ' + (h >= 12 ? 'PM' : 'AM'); }
+
+  // conversation templates: each returns a conversation for a person p at time t
+  var T = {
+    leak: function (p, t) { var a = slot(1, 10, 30), b = slot(2, 14, 0); return { bee: 'bea', ch: 'call', title: 'Incoming call', outcome: 'Booked', tone: 'ok', value: 900, dur: '2:41', summary: 'Leak after the storm, stain on the ceiling. Booked a free inspection for ' + a + '.', msgs: [
+      ['sys', 'Bea picked up in 2 seconds'], ['bee', 'Thanks for calling Harper Roofing, this is Bea, the office\'s AI assistant. How can I help?'],
+      ['them', 'Hi, I\'ve got a leak in the back bedroom after the storm last night.'], ['bee', 'Sorry to hear that. Is water coming in right now, or did it stop?'],
+      ['them', 'It stopped. There\'s a stain on the ceiling though.'], ['bee', 'Okay. I can get an inspector out ' + a + ' or ' + b + '. Which works better?'],
+      ['them', a.split(' ')[0] + ' works.'], ['bee', 'Great. Can I get your name and the property address?'], ['them', p.name + ', ' + p.addr + '.'],
+      ['bee', 'Thanks, ' + p.first + '. You\'re booked for ' + a + '. You\'ll get a text tonight with your inspector\'s name.'], ['res', 'Booked · ' + a + ' · free inspection']] }; },
+    hail: function (p, t) { var a = slot(1, 8, 0); return { bee: 'bea', ch: 'chat', title: 'Website chat', outcome: 'Booked', tone: 'ok', value: 1200, summary: 'Hail on Saturday, wants it checked for insurance. Booked ' + a + '.', msgs: [
+      ['bee', 'Hi, this is Bea, Harper Roofing\'s AI assistant. What can I help with?'], ['them', 'Do you check for hail damage? We got hit pretty hard Saturday.'],
+      ['bee', 'We do. Inspections are free, and we photograph everything for your insurance. I have ' + a + ' or ' + slot(2, 13, 0) + '. Want one?'],
+      ['them', 'First one please'], ['bee', 'You got it. What\'s your name, mobile number and the address?'], ['them', p.name + ', ' + p.phone + ', ' + p.addr],
+      ['bee', 'Booked for ' + a + ', ' + p.first + '. You\'ll get a confirmation text in a minute.'], ['res', 'Booked · ' + a + ' · storm inspection']] }; },
+    insurance: function (p, t) { return { bee: 'bea', ch: 'call', title: 'Incoming call', outcome: 'Message for Luis', tone: 'dim', dur: '1:58', summary: 'Asked whether we can talk to the adjuster directly. Message sent to Luis.', msgs: [
+      ['sys', 'Bea picked up in 3 seconds'], ['bee', 'Thanks for calling Harper Roofing, this is Bea, the office\'s AI assistant. How can I help?'],
+      ['them', 'My adjuster is coming Thursday. Can someone from your team meet him there?'], ['bee', 'We do work with adjusters. Scheduling that is something Luis in our office handles. Can I have him call you this morning?'],
+      ['them', 'Yes please, it\'s ' + p.name + '.'], ['bee', 'Thanks, ' + p.first + '. I\'ve sent Luis your details and he\'ll call you within the hour.'], ['hand', 'Message for Luis · adjuster meeting Thursday']] }; },
+    warranty: function (p, t) { return { bee: 'bea', ch: 'call', title: 'Incoming call', outcome: 'Needs you', tone: 'warn', need: 'warranty', dur: '1:22', summary: 'Asked whether a 2019 roof is still under warranty. Bea promised a callback this morning.', msgs: [
+      ['sys', 'Bea picked up in 2 seconds'], ['bee', 'Thanks for calling Harper Roofing, this is Bea, the office\'s AI assistant. How can I help?'],
+      ['them', 'Is my 2019 roof still under warranty? The installer said 10 years.'], ['bee', 'Good question. Warranty terms depend on the job, so the office handles those. Can I have someone call you back this morning?'],
+      ['them', 'Sure. ' + p.name + ', ' + p.phone + '.'], ['bee', 'Got it. I\'ve sent them your details. Someone will call you this morning.'], ['hand', 'For Dana · warranty question · call back this morning']] }; },
+    emergency: function (p, t) { return { bee: 'bea', ch: 'call', title: 'After-hours call', outcome: 'Hand-off · urgent', tone: 'warn', dur: '1:05', summary: 'Water coming through the kitchen ceiling at night. On-call crew lead texted and called back in 4 minutes.', msgs: [
+      ['sys', 'Bea picked up in 1 second'], ['bee', 'Thanks for calling Harper Roofing, this is Bea, the office\'s AI assistant. How can I help?'],
+      ['them', 'Water is coming through my kitchen ceiling right now!'], ['bee', 'I\'m sorry, that sounds stressful. If it\'s safe, move anything valuable and put a bucket under it. I\'m getting our on-call crew lead for you now.'],
+      ['hand', 'On-call crew lead texted · urgent · conversation attached'], ['bee', 'He\'ll call you in the next few minutes. Is ' + p.phone + ' the best number?'], ['them', 'Yes. Thank you.'], ['sys', 'Crew lead called back in 4 minutes']] }; },
+    spanish: function (p, t) { var a = slot(2, 10, 30); return { bee: 'bea', ch: 'call', title: 'Incoming call · Spanish', outcome: 'Booked', tone: 'ok', value: 900, dur: '3:12', summary: 'Spanish-speaking caller with missing shingles. Booked ' + a + '. Notes written in English for the crew.', msgs: [
+      ['sys', 'Bea picked up in 2 seconds · switched to Spanish'], ['bee', 'Gracias por llamar a Harper Roofing, habla Bea, la asistente de IA de la oficina. ¿En qué le puedo ayudar?'],
+      ['them', 'Hola, se cayeron unas tejas del techo con el viento.'], ['bee', 'Lo siento. Podemos mandar a un inspector ' + a + '. ¿Le funciona?'],
+      ['them', 'Sí, perfecto.'], ['bee', 'Listo. Le llegará un mensaje de texto con el nombre del inspector.'], ['res', 'Booked · ' + a + ' · notes in English: wind damage, missing shingles']] }; },
+    spam: function (p, t) { return { bee: 'bea', ch: 'call', title: 'Incoming call', outcome: 'Sales call, declined', tone: 'dim', dur: '0:34', person: { name: 'Marketing caller', short: 'Sales call', city: '' }, summary: 'Cold call offering ads. Declined politely; nobody was bothered.', msgs: [
+      ['sys', 'Bea picked up in 2 seconds'], ['bee', 'Thanks for calling Harper Roofing, this is Bea, the office\'s AI assistant. How can I help?'],
+      ['them', 'Hi, I\'m calling about getting your business to the top of Google...'], ['bee', 'Thanks for calling. We\'re all set for marketing, so I\'ll let you go. Have a good day.']] }; },
+    area: function (p, t) { return { bee: 'bea', ch: 'text', title: 'Text message', outcome: 'Outside the area', tone: 'dim', person: { name: 'Caller from Waco', short: 'Waco caller', city: 'Waco', phone: '(254) 555-0148' }, summary: 'Asked about a roof in Waco. Explained the service area and took a message in case the office can refer someone.', msgs: [
+      ['them', 'Do you do roofs in Waco?'], ['bee', 'Hi, this is Bea, Harper Roofing\'s AI assistant. Sorry, we only work in Dallas, Plano, Frisco, Richardson and Allen. I can pass your number to the office in case they know someone near you. Want me to?'],
+      ['them', 'Sure, thanks.'], ['bee', 'Done. Someone may reach out with a referral.']] }; },
+    lead: function (p, t) { var a = slot(3, 9, 0); return { bee: 'miles', ch: 'text', title: 'New website lead', outcome: 'Estimate set', tone: 'ok', value: 11800, reply: 38, summary: 'Full replacement quote request, two-story home. Replied in 38 seconds and set an estimate for ' + a + '.', msgs: [
+      ['sys', 'Form came in · replied in 38 s'], ['bee', 'Hi ' + p.first + ', this is Miles, Harper Roofing\'s AI assistant. Thanks for the quote request! Is the house one story or two?'],
+      ['them', 'Two story, about 2,400 sq ft.'], ['bee', 'Got it. Our estimator can measure ' + a + ' or ' + slot(4, 13, 0) + '. Want one of those?'], ['them', 'The first one.'],
+      ['res', 'Estimate set · ' + a]] }; },
+    quote: function (p, t) { return { bee: 'miles', ch: 'text', title: 'Quote follow-up · day 3', outcome: 'Following up day 7', tone: 'dim', value: 9400, summary: 'Still comparing quotes. Miles will check back on day 7 as the playbook says.', msgs: [
+      ['sys', 'Quote sent 3 days ago · $9,400 replacement'], ['bee', 'Hi ' + p.first + ', it\'s Miles from Harper Roofing (I\'m the office\'s AI assistant). Any questions on the quote we sent?'],
+      ['them', 'Still comparing a couple quotes. Give me till next week.'], ['bee', 'Of course. I\'ll check back next week. If anything comes up, just reply here.'], ['sys', 'Next follow-up scheduled · day 7']] }; },
+    won: function (p, t) { return { bee: 'miles', ch: 'text', title: 'Quote follow-up · day 7', outcome: 'Won · $11,800', tone: 'ok', value: 11800, need: 'deposit', summary: 'Accepted the replacement quote. Passed to Dana to schedule the crew; Otis will send the deposit invoice.', msgs: [
+      ['bee', 'Hi ' + p.first + ', Miles from Harper Roofing (the office\'s AI assistant) checking in on your roof quote. Want to get on the schedule?'],
+      ['them', 'Yes, let\'s do it. When can you start?'], ['bee', 'Great news. Dana will call you today to pick a start date, and you\'ll get the deposit invoice by email.'], ['hand', 'For Dana · schedule the crew · quote accepted $11,800']] }; },
+    revive: function (p, t) { var a = slot(2, 15, 30); return { bee: 'miles', ch: 'email', title: 'Old lead, 94 days', outcome: 'Booked', tone: 'ok', value: 900, summary: 'Asked about gutters in the summer and never booked. Miles checked back and booked ' + a + '.', msgs: [
+      ['bee', 'Hi ' + p.first + ', this is Miles, Harper Roofing\'s AI assistant. You asked about new gutters this summer. Still on your list before the winter rains?'],
+      ['them', 'Actually yes. Can someone come look?'], ['bee', 'Happy to. ' + a + ' is open. Shall I put you down?'], ['them', 'Yes.'], ['res', 'Booked · ' + a + ' · gutter estimate']] }; },
+    confirm: function (p, t) { return { bee: 'ruby', ch: 'text', title: 'Reminder · 24 hours', outcome: 'Confirmed', tone: 'ok', summary: 'Confirmed tomorrow\'s inspection with one tap.', msgs: [
+      ['bee', 'Hi ' + p.first + ', Ruby from Harper Roofing (I\'m the office\'s AI assistant). Reminder: your free roof inspection is tomorrow at ' + slot(1, 10, 30).split(' ').slice(1).join(' ') + '. Reply C to confirm or R to reschedule.'],
+      ['them', 'C'], ['bee', 'Confirmed. See you tomorrow!'], ['res', 'Confirmed']] }; },
+    resched: function (p, t) { return { bee: 'ruby', ch: 'text', title: 'Reschedule', outcome: 'Moved · slot refilled', tone: 'ok', summary: 'Moved from Thursday to Friday 1 PM, then filled the open Thursday slot from the waitlist.', msgs: [
+      ['them', 'Something came up Thursday. Can we do Friday instead?'], ['bee', 'No problem, ' + p.first + '. I have Friday at 1:00 PM or 3:30 PM. Which works?'],
+      ['them', '1 works'], ['bee', 'Done, you\'re set for Friday at 1:00 PM.'], ['res', 'Moved to Fri 1:00 PM'], ['sys', 'Thursday slot offered to the waitlist · filled in 12 minutes']] }; },
+    paid: function (p, t) { return { bee: 'otis', ch: 'email', title: 'Invoice #1042', outcome: 'Paid · $8,640', tone: 'ok', value: 8640, summary: 'Re-roof invoice sent the day the job was done, one reminder, paid in 4 days.', msgs: [
+      ['sys', 'Crew marked the job done · invoice sent the same day'], ['bee', 'Hi ' + p.first + ', your invoice for the re-roof is ready: $8,640. You can pay by card or bank transfer at the secure link.'],
+      ['sys', 'Three days later'], ['bee', 'Quick reminder that invoice #1042 is due Friday. Reply here with any questions.'], ['them', 'Paid it just now, thanks!'], ['res', 'Paid · $8,640 · synced to QuickBooks']] }; },
+    dispute: function (p, t) { return { bee: 'otis', ch: 'text', title: 'Invoice #1051', outcome: 'Needs you', tone: 'warn', need: 'dispute', value: 640, summary: 'Says the invoice lists two vents but the crew replaced one. Passed to Luis; reminders paused.', msgs: [
+      ['bee', 'Hi ' + p.first + ', this is Otis, Harper Roofing\'s AI assistant. Friendly reminder that invoice #1051 for $640 is due this week.'],
+      ['them', 'The invoice says 2 vents but they only replaced 1.'], ['bee', 'Thanks for telling me. I\'ve paused reminders and sent this to Luis in the office, who\'ll fix it with you today.'], ['hand', 'For Luis · invoice question · reminders paused']] }; },
+    review5: function (p, t) { return { bee: 'june', ch: 'review', title: 'New Google review · 5 stars', outcome: 'Draft waiting', tone: 'warn', need: 'review5', summary: '5-star review. June drafted a reply for your approval (trial shift).', msgs: [
+      ['them', '★★★★★ "Crew showed up on time, cleaned everything up and the new roof looks great. Luis kept us posted the whole way."'],
+      ['draft', '<small>Draft reply · waiting for you</small>Thank you, ' + p.first + '! We\'re glad the new roof looks great, and we\'ll pass your kind words on to Luis and the crew.']] }; },
+    review3: function (p, t) { return { bee: 'june', ch: 'review', title: 'New Google review · 3 stars', outcome: 'Flagged to Dana', tone: 'warn', need: 'review3', summary: '3-star review about a late arrival. Flagged to Dana the same day with a holding reply drafted.', msgs: [
+      ['them', '★★★☆☆ "Good work on the repair but the crew was two hours late and nobody called."'],
+      ['hand', 'Flagged to Dana · same day · job details attached'],
+      ['draft', '<small>Draft reply · waiting for you</small>Thank you for the honest feedback, ' + p.first + '. You should have heard from us when the crew was running late. Dana will reach out to make it right.']] }; }
+  };
+
+  // build the week: [daysAgo, hour, minute, template]
+  var PLAN = [
+    [0, 7, 12, 'confirm'], [0, 7, 40, 'paid'], [0, 8, 4, 'leak'], [0, 8, 31, 'warranty'], [0, 8, 58, 'spam'], [0, 9, 2, 'hail'], [0, 9, 26, 'lead'], [0, 9, 47, 'review3'], [0, 10, 15, 'insurance'], [0, 10, 52, 'resched'], [0, 11, 20, 'dispute'], [0, 12, 5, 'spanish'], [0, 13, 40, 'review5'], [0, 14, 22, 'won'], [0, 15, 3, 'leak'], [0, 16, 30, 'quote'],
+    [1, 6, 12, 'leak'], [1, 7, 5, 'confirm'], [1, 8, 59, 'hail'], [1, 9, 41, 'lead'], [1, 10, 22, 'area'], [1, 11, 46, 'emergency'], [1, 13, 10, 'revive'], [1, 14, 30, 'paid'], [1, 16, 2, 'spanish'], [1, 22, 48, 'emergency'],
+    [2, 7, 30, 'confirm'], [2, 8, 15, 'leak'], [2, 9, 50, 'quote'], [2, 11, 5, 'insurance'], [2, 13, 30, 'resched'], [2, 15, 45, 'paid'], [2, 19, 12, 'lead'],
+    [3, 8, 2, 'hail'], [3, 9, 33, 'leak'], [3, 10, 47, 'spam'], [3, 12, 18, 'revive'], [3, 14, 6, 'confirm'], [3, 17, 55, 'lead'],
+    [4, 7, 45, 'leak'], [4, 9, 12, 'won'], [4, 11, 30, 'paid'], [4, 13, 15, 'spanish'], [4, 21, 40, 'hail'],
+    [5, 9, 10, 'leak'], [5, 10, 5, 'confirm'], [5, 12, 40, 'quote'],
+    [6, 10, 20, 'lead'], [6, 13, 0, 'leak']
+  ];
+  var CONVOS = [];
+  var nowT = NOW.getTime();
+  PLAN.forEach(function (r, i) {
+    var t = today0 - r[0] * DAY + (r[1] * 60 + r[2]) * 60000;
+    if (t > nowT) t = nowT - (PLAN.length - i) * 7 * 60000;    // keep today's items in the past
+    var p = person();
+    var c = T[r[3]](p, t);
+    c.id = 'c' + (i + 1); c.t = t; c.kind = r[3];
+    c.who = c.person ? Object.assign({ phone: '' }, c.person) : p;
+    CONVOS.push(c);
+  });
+  CONVOS.sort(function (a, b) { return b.t - a.t; });
+  var CON = {}; CONVOS.forEach(function (c) { CON[c.id] = c; });
+
+  // the things waiting on the owner
+  var handled = store.get('handled', {});
+  function needs() {
+    return CONVOS.filter(function (c) { return c.need && !handled[c.id] && c.t >= today0 - DAY; });
+  }
+
+  // per-day aggregates (sample) for charts and KPIs
+  var DAILY = [];  // index 0 = today
+  var base = [6, 38, 31, 29, 33, 35, 14];  // by weekday Sun..Sat
+  for (var k = 0; k < 7; k++) {
+    var d = new Date(today0 - k * DAY), wd = d.getDay();
+    var calls = base[wd];
+    if (k === 0) { var hrs = Math.max(1, Math.min(11, NOW.getHours() - 7 + NOW.getMinutes() / 60)); calls = Math.round(33 * hrs / 11); }  // today always reads as a working day
+    DAILY.push({ t: d.getTime(), calls: calls, booked: Math.round(calls * .18), paid: Math.round(calls * 86) , leads: Math.round(calls * .28) });
+  }
+  var live = { calls: DAILY[0].calls, booked: DAILY[0].booked, paid: DAILY[0].paid };
+
+  var WEEKS = [];
+  for (var w = 0; w < 6; w++) {
+    var end = new Date(today0 - ((new Date(today0).getDay() + 6) % 7) * DAY - w * 7 * DAY - DAY);  // last Sunday, then earlier
+    var start = new Date(end.getTime() - 6 * DAY);
+    var f = [1, .97, 1.04, .9, .95, .86][w];
+    WEEKS.push({ start: start, end: end, calls: Math.round(214 * f), booked: Math.round(37 * f), paid: Math.round(18420 * f), reply: Math.round(41 / f), noshow: [2, 3, 3, 4, 4, 6][w], dtp: [4.1, 4.6, 5.2, 6.5, 8.1, 9.8][w], convos: Math.round(312 * f), leads: Math.round(58 * f) });
+  }
+  function range(wk) { return MN[wk.start.getMonth()] + ' ' + wk.start.getDate() + ' – ' + (wk.start.getMonth() === wk.end.getMonth() ? '' : MN[wk.end.getMonth()] + ' ') + wk.end.getDate(); }
+
+  // rules
+  var RULES = store.get('rules', null) || [
+    { id: 'r1', bee: 'all', text: 'Say you\'re an AI assistant in the first line, every time', on: true, locked: true },
+    { id: 'r2', bee: 'all', text: 'Never take card numbers by text or phone; send the secure link', on: true, locked: true },
+    { id: 'r3', bee: 'bea', text: 'Answer after hours and on weekends', on: true },
+    { id: 'r4', bee: 'bea', text: 'Book inspections in Dallas, Plano, Frisco, Richardson and Allen', on: true },
+    { id: 'r5', bee: 'bea', text: 'Quote firm prices on the phone', on: false },
+    { id: 'r6', bee: 'bea', text: 'Send insurance claim questions to Luis', on: true },
+    { id: 'r7', bee: 'bea', text: 'Answer Spanish-speaking callers in Spanish', on: true },
+    { id: 'r8', bee: 'miles', text: 'Follow up on quotes on day 1, 3, 7 and 14, then monthly for three months', on: true },
+    { id: 'r9', bee: 'miles', text: 'No texts before 8 AM or after 8 PM', on: true },
+    { id: 'r10', bee: 'ruby', text: 'Remind 24 hours and 2 hours before every visit', on: true },
+    { id: 'r11', bee: 'ruby', text: 'Fill cancellations from the waitlist automatically', on: true },
+    { id: 'r12', bee: 'june', text: 'Ask every customer for a review 2 hours after the job is done', on: true },
+    { id: 'r13', bee: 'june', text: 'Send me 3-star and lower reviews the same day', on: true },
+    { id: 'r14', bee: 'otis', text: 'Send reminders 3, 7 and 14 days after the due date', on: true },
+    { id: 'r15', bee: 'otis', text: 'Pause reminders and tell Luis when a customer questions an invoice', on: true },
+    { id: 'r16', bee: 'otis', text: 'Add a late fee', on: false }
+  ];
+  function saveRules() { store.set('rules', RULES); }
+
+  // ------------------------------------------------------------ charts
+  function bars(data, opts) {
+    // data: [{label, v, tip}] oldest first; single series, honey columns
+    opts = opts || {};
+    var W = 560, H = opts.h || 190, padL = 34, padB = 26, padT = 16;
+    var max = Math.max.apply(null, data.map(function (d) { return d.v; })) || 1;
+    var step = Math.pow(10, Math.floor(Math.log10(max)));
+    var top = Math.ceil(max / step) * step; if (top / step > 5) step *= 2; top = Math.ceil(max / step) * step;
+    var n = data.length, band = (W - padL) / n, bw = Math.min(24, band * .56);
+    var y = function (v) { return padT + (H - padT - padB) * (1 - v / top); };
+    var g = '<g class="grid">';
+    for (var v = 0; v <= top + 1e-9; v += step) g += '<line x1="' + padL + '" x2="' + W + '" y1="' + y(v).toFixed(1) + '" y2="' + y(v).toFixed(1) + '"/>';
+    g += '</g><g class="ax">';
+    for (v = 0; v <= top + 1e-9; v += step) g += '<text x="' + (padL - 8) + '" y="' + (y(v) + 4).toFixed(1) + '" text-anchor="end">' + (opts.fmt ? opts.fmt(v, true) : v) + '</text>';
+    var b = '';
+    data.forEach(function (d, i) {
+      var x = padL + band * i + (band - bw) / 2, yy = y(d.v), h = Math.max(0, H - padB - yy), r = Math.min(4, h);
+      g += '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle">' + esc(d.label) + '</text>';
+      var path = h > 0 ? 'M' + x.toFixed(1) + ' ' + (H - padB) + 'V' + (yy + r).toFixed(1) + 'Q' + x.toFixed(1) + ' ' + yy.toFixed(1) + ' ' + (x + r).toFixed(1) + ' ' + yy.toFixed(1) + 'H' + (x + bw - r).toFixed(1) + 'Q' + (x + bw).toFixed(1) + ' ' + yy.toFixed(1) + ' ' + (x + bw).toFixed(1) + ' ' + (yy + r).toFixed(1) + 'V' + (H - padB) + 'Z' : '';
+      b += '<rect class="hit" x="' + (padL + band * i).toFixed(1) + '" y="' + padT + '" width="' + band.toFixed(1) + '" height="' + (H - padT - padB) + '" tabindex="0" data-tip="' + esc(d.tip) + '" data-tipl="' + esc(d.tipl || d.label) + '"></rect>';
+      b += path ? '<path class="bar' + (d.dim ? ' dim' : '') + '" d="' + path + '"/>' : '';
+      if (d.mark) b += '<text class="val" x="' + (x + bw / 2).toFixed(1) + '" y="' + (yy - 7).toFixed(1) + '" text-anchor="middle">' + esc(d.mark) + '</text>';
+    });
+    g += '</g>';
+    var desc = (opts.title || 'Chart') + ': ' + data.map(function (d) { return d.label + ' ' + d.tip; }).join(', ');
+    return '<div class="chart"><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(desc) + '">' + g + b + '</svg></div>';
+  }
+  document.addEventListener('pointerover', function (e) { var h = e.target.closest && e.target.closest('.hit'); if (h) showTip(h); });
+  document.addEventListener('pointerout', function (e) { if (e.target.closest && e.target.closest('.hit')) tipEl.hidden = true; });
+  document.addEventListener('focusin', function (e) { if (e.target.classList && e.target.classList.contains('hit')) showTip(e.target); });
+  document.addEventListener('focusout', function (e) { if (e.target.classList && e.target.classList.contains('hit')) tipEl.hidden = true; });
+  function showTip(h) {
+    var r = h.getBoundingClientRect();
+    tipEl.textContent = '';
+    var b = document.createElement('b'); b.textContent = h.getAttribute('data-tip');
+    var s = document.createElement('span'); s.textContent = h.getAttribute('data-tipl');
+    tipEl.appendChild(b); tipEl.appendChild(s);
+    tipEl.style.left = (r.left + r.width / 2) + 'px'; tipEl.style.top = (r.top + 18) + 'px';
+    tipEl.hidden = false;
+  }
+
+  // ------------------------------------------------------------ navigation
+  var NAV = [['today', 'Today'], ['inbox', 'Inbox'], ['log', 'Shift log'], ['bees', 'Bees'], ['rules', 'Rules'], ['reports', 'Honey Reports'], ['account', 'Settings']];
+  function navHtml(cur) {
+    var n = needs().length;
+    $('#nav').innerHTML = NAV.map(function (x) {
+      var ct = x[0] === 'today' && n ? '<span class="ct">' + n + '</span>' : x[0] === 'inbox' ? '<span class="ct dim">' + CONVOS.filter(function (c) { return c.t >= today0; }).length + '</span>' : '';
+      return '<a href="#' + x[0] + '" class="' + (cur === x[0] ? 'on' : '') + '"' + (cur === x[0] ? ' aria-current="page"' : '') + '>' + icon(x[0]) + x[1] + ct + '</a>';
+    }).join('');
+    var tabs = [['today', 'Today'], ['inbox', 'Inbox'], ['log', 'Log'], ['bees', 'Bees'], ['more', 'More']];
+    $('#tabbar').innerHTML = tabs.map(function (x) {
+      var on = cur === x[0] || (x[0] === 'more' && ['rules', 'reports', 'account'].indexOf(cur) >= 0);
+      var ct = x[0] === 'today' && n ? '<span class="ct">' + n + '</span>' : '';
+      return '<a href="#' + (x[0] === 'more' ? 'more' : x[0]) + '" class="' + (on ? 'on' : '') + '">' + icon(x[0] === 'more' ? 'more' : x[0]) + x[1] + ct + '</a>';
+    }).join('');
+  }
+
+  var view = $('#view'), titleEl = $('#title');
+  var liveTimer = null;
+  function route() {
+    clearInterval(liveTimer); liveTimer = null;
+    var h = (location.hash || '#today').slice(1).split('-');
+    var page = h[0] || 'today', arg = h[1];
+    var fn = { today: vToday, inbox: vInbox, log: vLog, bees: vBees, rules: vRules, reports: vReports, account: vSettings, more: vMore }[page] || vToday;
+    navHtml(page === 'more' ? 'more' : page);
+    view.innerHTML = '<div class="view" style="display:grid;gap:18px">' + fn(arg) + '</div>';
+    titleEl.textContent = { today: 'Today', inbox: 'Inbox', log: 'Shift log', bees: 'Bees', rules: 'Rules', reports: 'Honey Reports', account: 'Settings', more: 'More' }[page] || 'Today';
+    if (page === 'today') startLive();
+    window.scrollTo(0, 0);
+  }
+  addEventListener('hashchange', route);
+
+  // ------------------------------------------------------------ views
+  function greet() { var h = NOW.getHours(); return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'; }
+  function needHtml(c) {
+    var b = BEE[c.bee], p = c.who;
+    var quote = '', draft = '', acts = '';
+    if (c.need === 'warranty') { quote = '"Is my 2019 roof still under warranty? The installer said 10 years."'; acts = '<button class="btn btn-honey btn-sm" data-act="call" data-id="' + c.id + '">Call ' + esc(p.first) + ' back</button><button class="btn btn-ghost btn-sm" data-act="keeper" data-id="' + c.id + '">Ask Sam to handle it</button>'; }
+    if (c.need === 'dispute') { quote = '"The invoice says 2 vents but they only replaced 1."'; acts = '<button class="btn btn-honey btn-sm" data-act="fix" data-id="' + c.id + '">Fix invoice and resend</button><button class="btn btn-ghost btn-sm" data-act="call" data-id="' + c.id + '">Call ' + esc(p.first) + '</button>'; }
+    if (c.need === 'review5') { draft = 'Thank you, ' + esc(p.first) + '! We\'re glad the new roof looks great, and we\'ll pass your kind words on to Luis and the crew.'; acts = '<button class="btn btn-honey btn-sm" data-act="approve" data-id="' + c.id + '">Approve and post</button><button class="btn btn-ghost btn-sm" data-act="open" data-id="' + c.id + '">Edit</button>'; }
+    if (c.need === 'review3') { quote = '★★★☆☆ "Good work on the repair but the crew was two hours late and nobody called."'; draft = 'Thank you for the honest feedback, ' + esc(p.first) + '. You should have heard from us when the crew was running late. Dana will reach out to make it right.'; acts = '<button class="btn btn-honey btn-sm" data-act="approve" data-id="' + c.id + '">Approve reply</button><button class="btn btn-ghost btn-sm" data-act="call" data-id="' + c.id + '">Call ' + esc(p.first) + ' first</button>'; }
+    if (c.need === 'deposit') { quote = 'Accepted the $11,800 replacement quote and wants a start date.'; acts = '<button class="btn btn-honey btn-sm" data-act="schedule" data-id="' + c.id + '">Pick a start date</button><button class="btn btn-ghost btn-sm" data-act="open" data-id="' + c.id + '">See the thread</button>'; }
+    var title = { warranty: 'Warranty question from ' + p.short, dispute: 'Invoice question from ' + p.short, review5: 'June drafted a reply to a 5-star review', review3: '3-star review from ' + p.short, deposit: p.short + ' accepted a quote' }[c.need];
+    return '<div class="need-item" data-need="' + c.id + '"><span class="av">' + b.ini + '</span><div><b>' + esc(title) + '</b><p>' + esc(c.summary) + ' <span class="mono" style="margin-left:4px">' + when(c.t) + '</span></p>' +
+      (quote ? '<div class="quote">' + esc(quote) + '</div>' : '') + (draft ? '<div class="draft">' + draft + '</div>' : '') + '<div class="acts">' + acts + '</div></div></div>';
+  }
+  function evHtml(c, isNew) {
+    var b = BEE[c.bee];
+    var line = { call: 'answered a call from', chat: 'answered a website chat from', text: 'texted with', email: 'emailed', review: 'saw a new review from' }[c.ch] || 'helped';
+    return '<a class="ev' + (isNew ? ' new' : '') + '" href="#inbox-' + c.id + '"><time>' + clock(c.t) + '</time><span class="av">' + b.ini + '</span><p><b>' + b.name + '</b> ' + line + ' ' + esc(c.who.short || c.who.name) + '. ' + esc(c.outcome) + '.</p></a>';
+  }
+  function vToday() {
+    var n = needs(), todays = CONVOS.filter(function (c) { return c.t >= today0; });
+    var last = WEEKS[0];
+    var week = DAILY.slice().reverse();
+    var chart = bars(week.map(function (d, i) { var dd = new Date(d.t); return { label: i === 6 ? 'Today' : DN[dd.getDay()], v: d.calls, tip: d.calls + ' calls answered', tipl: i === 6 ? 'Today so far' : DN[dd.getDay()] + ', ' + MN[dd.getMonth()] + ' ' + dd.getDate(), mark: i === 6 ? String(d.calls) : '' }; }),
+      { title: 'Calls Bea answered, last 7 days', h: 180 });
+    return '<div class="hello"><div><span class="mono">' + DN[NOW.getDay()] + ', ' + MN[NOW.getMonth()] + ' ' + NOW.getDate() + ' &middot; Sample data</span><h2 style="margin-top:8px">' + greet() + ', <em>Dana.</em></h2><p>' + (n.length ? n.length + ' things need you. Everything else is handled.' : 'Nothing needs you right now. Everything is handled.') + '</p></div><span class="pill ok"><span class="dot"></span>' + BEES.filter(function (b) { return b.status === 'on'; }).length + ' bees on shift</span></div>' +
+      '<div class="kpis">' +
+        '<div class="kpi" id="kCalls"><span>Calls answered today</span><b class="tab">' + live.calls + '</b><small>out of ' + live.calls + ' &middot; none missed</small></div>' +
+        '<div class="kpi" id="kBooked"><span>Jobs booked today</span><b class="tab">' + live.booked + '</b><small>' + last.booked + ' last week</small></div>' +
+        '<div class="kpi" id="kPaid"><span>Paid today</span><b class="tab">' + money(live.paid) + '</b><small>' + kfmt(last.paid) + ' last week</small></div>' +
+        '<button class="kpi need" data-act="scroll-needs" type="button"><span>Needs you</span><b class="tab">' + n.length + '</b><small>' + (n.length ? 'tap to see them' : 'all clear') + '</small></button>' +
+      '</div>' +
+      '<div class="split">' +
+        '<section class="card" id="needs"><div class="ch-row"><h2 class="ch">Needs you</h2><span class="mono">' + n.length + ' open</span></div><div class="list" id="needList">' + (n.length ? n.map(needHtml).join('') : '<div class="empty"><b>All clear.</b>Your bees have everything else.</div>') + '</div></section>' +
+        '<div style="display:grid;gap:18px">' +
+          '<section class="card"><div class="ch-row"><h2 class="ch">Live shift log</h2><span class="mono livetag"><i></i>Simulated live</span></div><div class="feed" id="feed">' + todays.slice(0, 7).map(function (c) { return evHtml(c); }).join('') + '</div><p style="margin-top:10px"><a class="btn btn-ghost btn-sm" href="#log">Open the shift log</a></p></section>' +
+          '<section class="card"><div class="ch-row"><h2 class="ch">Calls answered</h2><span class="mono">Last 7 days</span></div>' + chart + '</section>' +
+          '<section class="card"><div class="ch-row"><h2 class="ch">On shift</h2><a class="btn btn-ghost btn-sm" href="#bees">All bees</a></div>' + BEES.map(function (b) {
+            var st = b.status === 'on' ? '<span class="pill ok"><span class="dot"></span>On shift</span>' : b.status === 'trial' ? '<span class="pill warn">Trial shift</span>' : b.status === 'paused' ? '<span class="pill">Paused</span>' : '<span class="pill">Setting up</span>';
+            var last2 = { bea: 'Booked an inspection, ' + clock(CONVOS.filter(function (c) { return c.bee === 'bea'; })[0].t), miles: 'Replied to a web lead in 38 s', ruby: 'Sent 14 reminders this morning', june: '3 drafts waiting for you', otis: '$8,640 paid this morning', penny: 'Starts next Monday' }[b.id];
+            return '<a class="beerow" href="#bees-' + b.id + '"><span class="av' + (b.status === 'on' ? '' : ' dim') + '">' + b.ini + '</span><div><b>' + b.name + ' &middot; ' + b.job + '</b><small>' + esc(last2) + '</small></div>' + st + '</a>';
+          }).join('') + '</section>' +
+        '</div>' +
+      '</div>';
+  }
+  var LIVE_EVENTS = [
+    function () { return { bee: 'bea', text: 'answered a call from a new caller in ' + pick(CITY) + '. Booked an inspection.', k: 'booked' }; },
+    function () { return { bee: 'ruby', text: 'sent tomorrow\'s reminders. ' + (5 + Math.floor(R() * 6)) + ' confirmed so far.' }; },
+    function () { return { bee: 'miles', text: 'replied to an Angi lead in ' + (30 + Math.floor(R() * 25)) + ' seconds.' }; },
+    function () { return { bee: 'bea', text: 'answered a call about a gutter repair. Message sent to Luis.', k: 'call' }; },
+    function () { return { bee: 'otis', text: 'got an invoice paid: ' + money(300 + Math.floor(R() * 20) * 50) + '.', k: 'paid' }; },
+    function () { return { bee: 'bea', text: 'answered a website chat. Booked a storm inspection.', k: 'booked' }; }
+  ];
+  function startLive() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var i = 0;
+    liveTimer = setInterval(function () {
+      if (document.hidden) return;
+      var feed = $('#feed'); if (!feed) return;
+      var ev = LIVE_EVENTS[i++ % LIVE_EVENTS.length](), b = BEE[ev.bee];
+      var a = document.createElement('div'); a.className = 'ev new';
+      a.innerHTML = '<time>' + clock(Date.now()) + '</time><span class="av">' + b.ini + '</span><p><b>' + b.name + '</b> ' + esc(ev.text) + '</p>';
+      feed.insertBefore(a, feed.firstChild);
+      while (feed.children.length > 7) feed.removeChild(feed.lastChild);
+      if (ev.k === 'booked' || ev.k === 'call') { live.calls++; bump('#kCalls', live.calls); }
+      if (ev.k === 'booked') { live.booked++; bump('#kBooked', live.booked); }
+      if (ev.k === 'paid') { live.paid += 450; bump('#kPaid', money(live.paid)); }
+    }, 9000);
+  }
+  function bump(sel, v) { var el = $(sel); if (!el) return; el.querySelector('b').textContent = v; if (sel === '#kCalls') el.querySelector('small').textContent = 'out of ' + v + ' · none missed'; el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
+
+  var inboxFilter = { ch: 'all', bee: 'all', q: '' };
+  function vInbox(id) {
+    var list = CONVOS.filter(function (c) {
+      if (inboxFilter.ch !== 'all' && (inboxFilter.ch === 'needs' ? !(c.need && !handled[c.id]) : c.ch !== inboxFilter.ch)) return false;
+      if (inboxFilter.bee !== 'all' && c.bee !== inboxFilter.bee) return false;
+      if (inboxFilter.q) { var hay = (c.who.name + ' ' + c.summary + ' ' + c.outcome + ' ' + c.msgs.map(function (m) { return m[1]; }).join(' ')).toLowerCase(); if (hay.indexOf(inboxFilter.q.toLowerCase()) < 0) return false; }
+      return true;
+    });
+    var open = id && CON[id];
+    var chs = [['all', 'All'], ['needs', 'Needs you'], ['call', 'Calls'], ['text', 'Texts'], ['chat', 'Chats'], ['email', 'Email'], ['review', 'Reviews']];
+    var filters = '<div class="filters" role="group" aria-label="Filter conversations">' + chs.map(function (x) { return '<button class="chipb" data-act="fch" data-v="' + x[0] + '" aria-pressed="' + (inboxFilter.ch === x[0]) + '">' + x[1] + '</button>'; }).join('') +
+      '<span style="width:10px"></span>' + [['all', 'Every bee']].concat(BEES.filter(function (b) { return b.status !== 'setup'; }).map(function (b) { return [b.id, b.name]; })).map(function (x) {
+        return '<button class="chipb" data-act="fbee" data-v="' + x[0] + '" aria-pressed="' + (inboxFilter.bee === x[0]) + '">' + (x[0] !== 'all' ? '<span class="av">' + BEE[x[0]].ini + '</span>' : '') + x[1] + '</button>'; }).join('') + '</div>';
+    var rows = list.length ? list.map(function (c) {
+      var b = BEE[c.bee], last = c.msgs.filter(function (m) { return m[0] === 'them' || m[0] === 'bee'; }).slice(-1)[0];
+      return '<a class="irow' + (open && open.id === c.id ? ' on' : '') + '" href="#inbox-' + c.id + '"><span class="av">' + b.ini + '</span><div style="min-width:0"><b>' + esc(c.who.name) + '</b><p class="pv">' + esc(last ? last[1].replace(/<[^>]+>/g, '') : c.summary) + '</p></div><div class="meta"><time>' + when(c.t) + '</time><span class="pill ' + (c.tone === 'ok' ? 'ok' : c.tone === 'warn' ? 'warn' : '') + '">' + esc(c.outcome) + '</span></div></a>';
+    }).join('') : '<div class="empty"><b>Nothing here.</b>Try another filter.</div>';
+    return filters + '<div class="inbox' + (open ? ' has-open' : '') + '"><div class="ilist">' + rows + '</div>' + (open ? convoHtml(open) : '<section class="card convo"><div class="empty"><b>Pick a conversation.</b>Every call, text, chat and email your bees handled is here, with the full transcript.</div></section>') + '</div>';
+  }
+  function convoHtml(c) {
+    var b = BEE[c.bee];
+    var msgs = c.msgs.map(function (m) { return '<div class="m ' + m[0] + '">' + (m[0] === 'draft' ? m[1] : esc(m[1])) + '</div>'; }).join('');
+    var facts = [['Outcome', '<span class="pill ' + (c.tone === 'ok' ? 'ok' : c.tone === 'warn' ? 'warn' : '') + '">' + esc(c.outcome) + '</span>'], ['Customer', esc(c.who.name)], c.who.phone ? ['Phone', esc(c.who.phone)] : null, c.who.addr ? ['Address', esc(c.who.addr)] : c.who.city ? ['City', esc(c.who.city)] : null,
+      ['Bee', b.name + ', ' + b.job.toLowerCase()], ['When', dayLabel(c.t) + ', ' + clock(c.t)], c.dur ? ['Call length', c.dur] : null, c.value ? ['Job value', money(c.value) + (c.tone === 'ok' && c.outcome.indexOf('Paid') < 0 ? ' (estimate)' : '')] : null].filter(Boolean);
+    var acts = (c.need && !handled[c.id] ? '<button class="btn btn-honey btn-sm" data-act="done" data-id="' + c.id + '">Mark handled</button>' : '') +
+      (c.who.phone ? '<button class="btn btn-ghost btn-sm" data-act="call" data-id="' + c.id + '">Call back</button>' : '') + '<button class="btn btn-ghost btn-sm" data-act="flag" data-id="' + c.id + '">Flag for Sam</button>';
+    return '<section class="card convo" aria-label="Conversation"><a class="btn btn-ghost btn-sm back" href="#inbox">&larr; All conversations</a><div class="hd"><span class="ic">' + icon(c.ch === 'review' ? 'review' : c.ch) + '</span><div><b>' + esc(c.title) + '</b><small>' + esc(c.who.name) + (c.who.city ? ' &middot; ' + esc(c.who.city) : '') + '</small></div></div>' +
+      '<p style="color:var(--fg-2);font-size:.92rem">' + esc(c.summary) + '</p><div class="thread">' + msgs + '</div><dl class="facts">' + facts.map(function (f) { return '<dt>' + f[0] + '</dt><dd>' + f[1] + '</dd>'; }).join('') + '</dl><div class="acts">' + acts + '</div></section>';
+  }
+
+  var logBee = 'all';
+  function vLog() {
+    var list = CONVOS.filter(function (c) { return logBee === 'all' || c.bee === logBee; });
+    var extra = [[0, 7, 0, 'ruby', 'sent 14 reminders for today\'s visits. 13 confirmed, 1 rescheduled.'], [0, 7, 45, 'otis', 'synced 6 invoices and 4 payments to QuickBooks.'], [1, 18, 30, 'miles', 'sent day-3 follow-ups on 5 open quotes.'], [1, 7, 0, 'ruby', 'sent 11 reminders. All confirmed.'], [2, 9, 0, 'june', 'drafted 3 review requests for your approval.'], [3, 7, 30, 'otis', 'sent 4 invoices the same day the jobs were done.']]
+      .filter(function (e) { return logBee === 'all' || e[3] === logBee; }).map(function (e) { return { t: today0 - e[0] * DAY + (e[1] * 60 + e[2]) * 60000, bee: e[3], text: e[4] }; }).filter(function (e) { return e.t < nowT; });
+    var all = list.map(function (c) { return { t: c.t, c: c }; }).concat(extra.map(function (e) { return { t: e.t, e: e }; })).sort(function (a, b) { return b.t - a.t; });
+    var out = '', curDay = '';
+    all.forEach(function (x) {
+      var dl = dayLabel(x.t);
+      if (dl !== curDay) { if (curDay) out += '</div></section>'; curDay = dl; out += '<section class="card"><div class="day-h"><h2>' + dl + '</h2><span class="mono">' + all.filter(function (y) { return dayLabel(y.t) === dl; }).length + ' entries</span></div><div class="feed">'; }
+      if (x.c) out += evHtml(x.c);
+      else { var b = BEE[x.e.bee]; out += '<div class="ev"><time>' + clock(x.t) + '</time><span class="av">' + b.ini + '</span><p><b>' + b.name + '</b> ' + esc(x.e.text) + '</p></div>'; }
+    });
+    if (curDay) out += '</div></section>';
+    var filters = '<div class="filters" role="group" aria-label="Filter by bee">' + [['all', 'Every bee']].concat(BEES.filter(function (b) { return b.status !== 'setup'; }).map(function (b) { return [b.id, b.name]; })).map(function (x) {
+      return '<button class="chipb" data-act="lbee" data-v="' + x[0] + '" aria-pressed="' + (logBee === x[0]) + '">' + (x[0] !== 'all' ? '<span class="av">' + BEE[x[0]].ini + '</span>' : '') + x[1] + '</button>'; }).join('') + '</div>';
+    return '<div class="hello"><div><span class="mono">Sample data</span><h2 style="margin-top:8px">Everything your bees did, <em>with times.</em></h2></div></div>' + filters + out;
+  }
+
+  function metricText(b, v) { if (b.unit === 's') return v + ' s'; if (b.unit === '%') return v + '%'; if (b.unit === 'd') return v.toFixed(1) + ' days'; return String(v); }
+  function weekBars(b, h) {
+    var labels = WEEKS.slice().reverse().map(function (w) { return MN[w.start.getMonth()] + ' ' + w.start.getDate(); });
+    var vals = b.weeks.slice(1, 7).concat([b.weeks[6]]);
+    var data = WEEKS.slice().reverse().map(function (w, i) { var v = b.weeks[i + 1]; return { label: labels[i], v: v, tip: metricText(b, v), tipl: 'Week of ' + labels[i], mark: i === 5 ? metricText(b, v) : '' }; });
+    return bars(data, { title: b.metric + ' by week', h: h || 170 });
+  }
+  function vBees(id) {
+    if (id && BEE[id]) return beeDetail(BEE[id]);
+    return '<div class="hello"><div><span class="mono">Whole hive plan &middot; $1,690/mo</span><h2 style="margin-top:8px">Your bees, <em>one job each.</em></h2><p>Tap a bee to see its playbook, rules and numbers.</p></div></div><div class="bees">' + BEES.map(function (b) {
+      var st = b.status === 'on' ? '<span class="pill ok"><span class="dot"></span>On shift</span>' : b.status === 'trial' ? '<span class="pill warn">Trial shift</span>' : b.status === 'paused' ? '<span class="pill">Paused</span>' : '<span class="pill">Setting up</span>';
+      var v = b.weeks[6], prev = b.weeks[5];
+      var num = b.status === 'trial' ? '<div class="num"><b>3</b><span>drafts waiting for your approval</span></div>' : b.status === 'setup' ? '<div class="num"><b>Mon</b><span>first shift, next week</span></div>' :
+        '<div class="num"><b>' + metricText(b, v) + '</b><span>' + b.metric.toLowerCase() + ' last week' + (prev ? ' &middot; ' + ((b.lowGood ? v < prev : v > prev) ? 'better' : 'same') + ' than the week before' : '') + '</span></div>';
+      return '<a class="beec' + (b.status === 'on' ? '' : ' off') + '" href="#bees-' + b.id + '"><div class="tp"><span class="av">' + b.ini + '</span><div><h3>' + b.name + '</h3><span class="job">' + b.job + '</span></div>' + st + '</div>' + num + (b.status === 'on' || b.status === 'paused' ? weekBars(b, 120) : '<div class="empty" style="padding:18px">' + (b.status === 'trial' ? 'June goes fully on shift once you approve her first week.' : 'Sam is building Penny\'s playbook this week.') + '</div>') + '</a>';
+    }).join('') + '</div>';
+  }
+  function beeDetail(b) {
+    var convos = CONVOS.filter(function (c) { return c.bee === b.id; }).slice(0, 5);
+    var rules = RULES.filter(function (r) { return r.bee === b.id; });
+    var PB = {
+      bea: [['Services and prices', [['Roof inspection', 'Free'], ['Roof repair', 'Quoted after inspection; most $350 to $1,200'], ['Roof replacement', 'Quoted after inspection'], ['Storm damage and insurance claims', 'Free inspection'], ['Gutters', 'Quoted on site']]], ['Hours and area', [['Office', 'Mon to Fri 7 AM to 6 PM; Sat 8 AM to noon'], ['After hours', 'Book inspections, take messages; emergencies to on-call'], ['Service area', 'Dallas, Plano, Frisco, Richardson, Allen']]], ['Questions customers ask', [['Do you work with insurance?', 'Yes. We document damage and work with your adjuster.'], ['Is the inspection free?', 'Yes, no obligation.'], ['How long is a replacement?', 'One to two days once materials arrive.']]], ['Hand-offs', [['Emergencies', 'Warm transfer, or text the on-call phone after hours'], ['Insurance and scheduling', 'Luis Ortega, office manager'], ['Warranties and pricing exceptions', 'Dana Harper, owner']]]],
+      miles: [['Lead sources', [['Website form', 'Reply within 60 seconds'], ['Google Business Profile', 'Reply within 60 seconds'], ['Angi', 'Reply within 60 seconds'], ['Facebook', 'Reply within 60 seconds']]], ['Follow-up schedule', [['Open quotes', 'Day 1, 3, 7 and 14, then monthly for 3 months'], ['Old leads', 'Check back after 90 days'], ['Stops when', 'They book, say no or ask us to stop']]]],
+      ruby: [['Reminders', [['Confirmation', 'Right after booking'], ['Reminders', '24 hours and 2 hours before'], ['No-shows', 'One text to rebook']]], ['Changes', [['Reschedules', 'Free, 24 hours\' notice requested'], ['Waitlist', 'On: fill cancellations automatically']]]],
+      june: [['Review requests', [['Who', 'Every customer with a finished job'], ['When', '2 hours after the job is marked done'], ['Where', 'Google and Facebook']]], ['Replies', [['Style', 'First name, mention the job, two sentences'], ['3 stars or lower', 'Sent to Dana the same day']]]],
+      otis: [['Invoices', [['System', 'QuickBooks Online'], ['Terms', 'Repairs due on receipt; replacements 50% deposit'], ['Ways to pay', 'Card, ACH bank transfer, check']]], ['Reminders', [['Schedule', '3, 7 and 14 days after the due date'], ['Questions or disputes', 'Paused and sent to Luis'], ['Never', 'Take card numbers by text or phone']]]],
+      penny: [['Plan', [['Channels', 'Google Business Profile, Facebook, Instagram, monthly email'], ['Cadence', 'Two Google posts and two social posts a week'], ['Approval', 'You approve offers and anything with a price']]]]
+    }[b.id];
+    var on = b.status === 'on';
+    var ctl = b.status === 'on' || b.status === 'paused' ? '<div class="ctl"><span class="mono">' + (on ? 'On shift' : 'Paused') + '</span><button class="sw" role="switch" data-act="pause" data-id="' + b.id + '" aria-checked="' + on + '" aria-label="' + b.name + ' on shift"></button></div>' : '<span class="pill warn">' + (b.status === 'trial' ? 'Trial shift' : 'Setting up') + '</span>';
+    return '<a class="btn btn-ghost btn-sm" href="#bees" style="justify-self:start">&larr; All bees</a>' +
+      '<section class="card beehead"><span class="av">' + b.ini + '</span><div><h2>' + b.name + '</h2><p>' + b.job + ' &middot; judged on ' + b.metric.toLowerCase() + '</p></div>' + ctl + '</section>' +
+      '<div class="split"><div style="display:grid;gap:18px">' +
+        (b.status === 'on' || b.status === 'paused' ? '<section class="card"><div class="ch-row"><h2 class="ch">' + b.metric + '</h2><span class="mono">' + (b.lowGood ? 'Lower is better &middot; ' : '') + 'Last 6 weeks</span></div>' + weekBars(b, 190) + '</section>' : '') +
+        '<section class="card"><div class="ch-row"><h2 class="ch">Recent work</h2><a class="btn btn-ghost btn-sm" href="#inbox">Inbox</a></div><div class="feed">' + (convos.length ? convos.map(function (c) { return evHtml(c); }).join('') : '<div class="empty"><b>Nothing yet.</b>' + b.name + '\'s first shift starts soon.</div>') + '</div></section>' +
+      '</div><div style="display:grid;gap:18px">' +
+        '<section class="card"><div class="ch-row"><h2 class="ch">Playbook</h2><span class="mono">Kept by Sam</span></div>' + PB.map(function (sec, i) { return '<details class="pb"' + (i === 0 ? ' open' : '') + '><summary>' + sec[0] + '</summary><div class="bd">' + sec[1].map(function (r) { return '<div class="li"><b>' + esc(r[0]) + '</b><span>' + esc(r[1]) + '</span></div>'; }).join('') + '</div></details>'; }).join('') +
+          '<label class="sr" for="req">Ask for a change</label><textarea class="req" id="req" placeholder="Ask Sam for a change, e.g. &quot;We now offer metal roofs&quot;"></textarea><div class="acts" style="margin-top:10px"><button class="btn btn-honey btn-sm" data-act="req" data-id="' + b.id + '">Send to Sam</button></div></section>' +
+        (rules.length ? '<section class="card"><div class="ch-row"><h2 class="ch">' + b.name + '\'s rules</h2><a class="btn btn-ghost btn-sm" href="#rules">All rules</a></div>' + rules.map(ruleHtml).join('') + '</section>' : '') +
+      '</div></div>';
+  }
+  function ruleHtml(r) {
+    return '<div class="rule"><div><p>' + esc(r.text) + '</p>' + (r.pending ? '<small>Waiting for Sam to review &middot; usually same day</small>' : r.locked ? '<small>Always on for every bee</small>' : '') + '</div><button class="sw" role="switch" data-act="rule" data-id="' + r.id + '" aria-checked="' + !!r.on + '"' + (r.locked ? ' disabled style="opacity:.6;cursor:default"' : '') + ' aria-label="' + esc(r.text) + '"></button></div>';
+  }
+  function vRules() {
+    var groups = [['all', 'Every bee']].concat(BEES.filter(function (b) { return b.id !== 'penny'; }).map(function (b) { return [b.id, b.name + ', ' + b.job.toLowerCase()]; }));
+    return '<div class="hello"><div><span class="mono">Sample data</span><h2 style="margin-top:8px">Your rules, <em>in plain English.</em></h2><p>Switch a rule and the bee follows it on its next conversation. New rules go to Sam first.</p></div></div>' +
+      '<div class="grid2">' + groups.map(function (g) {
+        var rs = RULES.filter(function (r) { return r.bee === g[0]; });
+        return '<section class="card"><div class="ch-row"><h2 class="ch">' + (g[0] !== 'all' ? '<span class="av" style="--s:22px;vertical-align:middle;margin-right:8px">' + BEE[g[0]].ini + '</span>' : '') + g[1] + '</h2></div>' + rs.map(ruleHtml).join('') +
+          '<form class="addrule" data-bee="' + g[0] + '"><label class="sr" for="nr-' + g[0] + '">Add a rule</label><input id="nr-' + g[0] + '" maxlength="160" placeholder="Add a rule, e.g. &quot;No calls back on Sundays&quot;"><button class="btn btn-ghost btn-sm" type="submit">Add</button></form></section>';
+      }).join('') + '</div>';
+  }
+  function vReports(id) {
+    if (id != null && WEEKS[+id]) return reportHtml(+id);
+    var series = WEEKS.slice().reverse();
+    return '<div class="hello"><div><span class="mono">Every Monday at 7 AM</span><h2 style="margin-top:8px">Honey Reports, <em>in plain numbers.</em></h2></div></div>' +
+      '<section class="card"><div class="ch-row"><h2 class="ch">Jobs booked by week</h2><span class="mono">Sample data</span></div>' + bars(series.map(function (w, i) { return { label: MN[w.start.getMonth()] + ' ' + w.start.getDate(), v: w.booked, tip: w.booked + ' jobs booked', tipl: 'Week of ' + range(w), mark: i === 5 ? String(w.booked) : '' }; }), { title: 'Jobs booked by week', h: 180 }) + '</section>' +
+      '<div class="list">' + WEEKS.map(function (w, i) { return '<a class="wk" href="#reports-' + i + '"><div><b>' + range(w) + '</b><small>' + (i === 0 ? 'Last week' : i + 1 + ' weeks ago') + ' &middot; ' + w.convos + ' conversations handled</small></div><div class="nums"><span><b>' + w.calls + '</b>calls</span><span><b>' + w.booked + '</b>booked</span><span><b>' + kfmt(w.paid) + '</b>paid</span></div></a>'; }).join('') + '</div>';
+  }
+  function reportHtml(i) {
+    var w = WEEKS[i], prev = WEEKS[i + 1];
+    var dd = [];
+    for (var k = 0; k < 7; k++) { var day = new Date(w.start.getTime() + k * DAY); var v = Math.round([38, 31, 29, 33, 35, 14, 6][k] * w.calls / 186); dd.push({ label: DN[day.getDay()], v: v, tip: v + ' calls', tipl: DN[day.getDay()] + ', ' + MN[day.getMonth()] + ' ' + day.getDate(), mark: '' }); }
+    var maxI = dd.reduce(function (m, d, j) { return d.v > dd[m].v ? j : m; }, 0); dd[maxI].mark = String(dd[maxI].v);
+    var delta = function (a, b2, low) { if (!b2) return ''; var better = low ? a < b2 : a > b2; return ' <span class="mono" style="color:' + (better ? 'var(--ok)' : 'var(--fg-3)') + '">' + (better ? 'better than' : 'vs') + ' the week before</span>'; };
+    return '<a class="btn btn-ghost btn-sm" href="#reports" style="justify-self:start">&larr; All reports</a>' +
+      '<article class="email"><div class="eh"><b>Your Honey Report: ' + range(w) + '</b><small>From Bizzy Bee to Dana at Harper Roofing &middot; Monday 7:00 AM &middot; Sample data</small></div><div class="eb">' +
+      '<div><span class="mono">Last week your bees</span><p class="big" style="margin-top:10px">booked <em>' + w.booked + ' jobs</em> and collected <em>' + kfmt(w.paid) + '</em>.</p><p style="color:var(--fg-2);margin-top:10px">' + w.convos + ' conversations handled: calls, texts, chats, emails and reminders. Every one is in the shift log.</p></div>' +
+      '<div class="needs"><b>2 things need you:</b> a warranty question from a customer, and June\'s draft reply to a 3-star review. <a href="#today" style="color:var(--honey)">Open the hive</a></div>' +
+      '<div class="beesec"><span class="av">B</span><b>Bea answered all ' + w.calls + ' calls' + '</b><p>Booked ' + Math.round(w.booked * .7) + ' inspections, took ' + Math.round(w.calls * .08) + ' messages for the office and sent ' + Math.max(1, Math.round(w.calls / 110)) + ' emergencies to the on-call phone.' + delta(w.calls, prev && prev.calls) + '</p></div>' +
+      '<div class="beesec"><span class="av">M</span><b>Miles replied to ' + w.leads + ' leads, median ' + w.reply + ' seconds</b><p>Set ' + Math.round(w.booked * .3) + ' estimates and kept ' + Math.round(w.leads * .2) + ' open quotes warm.' + delta(w.reply, prev && prev.reply, true) + '</p></div>' +
+      '<div class="beesec"><span class="av">R</span><b>Ruby kept no-shows to ' + w.noshow + '%</b><p>Sent ' + Math.round(w.booked * 2.6) + ' reminders and filled ' + Math.max(1, Math.round(w.booked / 12)) + ' cancellations from the waitlist.' + delta(w.noshow, prev && prev.noshow, true) + '</p></div>' +
+      '<div class="beesec"><span class="av">O</span><b>Otis collected ' + money(w.paid) + '</b><p>Invoices paid in ' + w.dtp.toFixed(1) + ' days on average, synced to QuickBooks.' + delta(w.dtp, prev && prev.dtp, true) + '</p></div>' +
+      '<div><span class="mono">Calls by day</span>' + bars(dd, { title: 'Calls by day, week of ' + range(w), h: 170 }) + '</div>' +
+      '</div></article>';
+  }
+  function vSettings() {
+    var row = function (k, v, a) { return '<div class="set-row"><span>' + k + '</span><div>' + v + '</div>' + (a || '<span></span>') + '</div>'; };
+    return '<div class="hello"><div><span class="mono">Sample data</span><h2 style="margin-top:8px">Settings</h2><p>Most changes go through Sam, so you never have to dig through menus.</p></div></div><div class="grid2">' +
+      '<section class="card"><div class="ch-row"><h2 class="ch">Business</h2></div>' + row('Name', 'Harper Roofing') + row('Owner', 'Dana Harper') + row('Service area', 'Dallas, Plano, Frisco, Richardson, Allen') + row('Office hours', 'Mon to Fri 7 AM to 6 PM; Sat 8 AM to noon') + row('Languages', 'English, Spanish') + '</section>' +
+      '<section class="card"><div class="ch-row"><h2 class="ch">Phone numbers</h2></div>' + row('Main line', '(214) 555-0142', '<span class="pill ok">Forwarding to Bea</span>') + row('When', 'Missed calls and after hours') + row('Texting', '(214) 555-0142', '<span class="pill ok">Registered</span>') + '</section>' +
+      '<section class="card"><div class="ch-row"><h2 class="ch">Who gets hand-offs</h2></div>' + row('Dana Harper', 'Owner &middot; escalations, warranties, pricing', '<span class="mono">(214) 555-0101</span>') + row('Luis Ortega', 'Office manager &middot; insurance, scheduling, billing', '<span class="mono">(214) 555-0102</span>') + row('On-call crew lead', 'Active leaks after hours', '<span class="mono">(214) 555-0199</span>') + '</section>' +
+      '<section class="card"><div class="ch-row"><h2 class="ch">Connections</h2></div>' + row('Google Calendar', 'Inspections and estimates', '<span class="pill ok">Connected</span>') + row('QuickBooks Online', 'Invoices and payments', '<span class="pill ok">Connected</span>') + row('Google Business Profile', 'Reviews and posts', '<span class="pill ok">Connected</span>') + row('JobNimbus', 'Jobs and crews', '<button class="btn btn-ghost btn-sm" data-act="connect">Ask Sam to connect</button>') + '</section>' +
+      '<section class="card"><div class="ch-row"><h2 class="ch">Plan</h2></div>' + row('Plan', 'Whole hive &middot; $1,690/mo', '<button class="btn btn-ghost btn-sm" data-act="plan">Change</button>') + row('Bees', 'Bea, Miles, Ruby, Otis on shift; June on trial; Penny starts Monday') + row('Next invoice', '1st of next month') + row('Contract', 'None. Cancel with one email.') + '</section>' +
+      '<section class="card"><div class="ch-row"><h2 class="ch">Your Beekeeper</h2></div>' + row('Sam Ortiz', 'Sets up your bees, checks their work, answers when you call', '<button class="btn btn-honey btn-sm" data-act="beekeeper">Text Sam</button>') + row('Check-ins', 'Monthly call, quarterly planning') + '</section>' +
+      '</div>';
+  }
+  function vMore() {
+    return '<div class="list">' + [['rules', 'Rules', 'What each bee may and may not do'], ['reports', 'Honey Reports', 'Every Monday, in plain numbers'], ['account', 'Settings', 'Business, numbers, hand-offs, plan']].map(function (x) {
+      return '<a class="wk" href="#' + x[0] + '"><div><b>' + x[1] + '</b><small>' + x[2] + '</small></div>' + icon(x[0]) + '</a>'; }).join('') + '</div>';
+  }
+
+  // ------------------------------------------------------------ actions
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-act]'); if (!el) return;
+    var act = el.getAttribute('data-act'), id = el.getAttribute('data-id');
+    var finish = function (msg) {
+      handled[id] = true; store.set('handled', handled);
+      var card = document.querySelector('[data-need="' + id + '"]');
+      toast(msg);
+      if (card) { card.classList.add('out'); setTimeout(route, 380); } else route();
+    };
+    if (act === 'approve') finish(CON[id].need === 'review3' ? 'Reply posted. Dana is calling them too.' : 'Reply approved and posted to Google');
+    else if (act === 'fix') finish('Invoice fixed and resent. Reminders back on.');
+    else if (act === 'schedule') finish('Start date set. Otis is sending the deposit invoice.');
+    else if (act === 'keeper') finish('Sent to Sam. He\'ll handle it this morning.');
+    else if (act === 'done') finish('Marked handled');
+    else if (act === 'call') toast('Calling ' + CON[id].who.name + ' (demo: no call is placed)');
+    else if (act === 'open') location.hash = '#inbox-' + id;
+    else if (act === 'flag') toast('Flagged for Sam with the transcript attached');
+    else if (act === 'beekeeper') toast('Opening a text to Sam (demo)');
+    else if (act === 'connect' || act === 'plan') toast('Sam will reach out today to set that up');
+    else if (act === 'scroll-needs') { var n = document.getElementById('needs'); if (n) n.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    else if (act === 'fch') { inboxFilter.ch = el.getAttribute('data-v'); route(); }
+    else if (act === 'fbee') { inboxFilter.bee = el.getAttribute('data-v'); route(); }
+    else if (act === 'lbee') { logBee = el.getAttribute('data-v'); route(); }
+    else if (act === 'rule') { var r = RULES.filter(function (x) { return x.id === id; })[0]; if (!r || r.locked) return; r.on = !r.on; saveRules(); el.setAttribute('aria-checked', r.on); toast((r.on ? 'On: ' : 'Off: ') + r.text); }
+    else if (act === 'pause') { var b = BEE[id]; b.status = b.status === 'on' ? 'paused' : 'on'; beeState[id] = b.status; store.set('bees', beeState); toast(b.name + (b.status === 'on' ? ' is back on shift' : ' is paused. Calls go to your voicemail.')); route(); }
+    else if (act === 'req') { var ta = document.getElementById('req'); if (!ta || !ta.value.trim()) { toast('Write the change first'); return; } ta.value = ''; toast('Sent to Sam. Most changes are live the same day.'); }
+    else if (act === 'ask') openAsk(true);
+    else if (act === 'ask-close') openAsk(false);
+  });
+  document.addEventListener('submit', function (e) {
+    var f = e.target;
+    if (f.classList.contains('addrule')) {
+      e.preventDefault();
+      var inp = f.querySelector('input'), v = inp.value.trim(); if (!v) return;
+      RULES.push({ id: 'n' + Date.now(), bee: f.getAttribute('data-bee'), text: v, on: true, pending: true }); saveRules();
+      toast('Rule added. Sam will review it today.'); route();
+    }
+  });
+  $('#q').addEventListener('keydown', function (e) { if (e.key === 'Enter') { inboxFilter.q = this.value.trim(); inboxFilter.ch = 'all'; location.hash = '#inbox'; route(); } });
+
+  // ------------------------------------------------------------ ask the hive
+  var askEl = $('#ask'), askBody = $('#askBody'), askForm = $('#askForm'), askIn = $('#askIn'), askNote = $('#askNote');
+  var SUGG = ['What needs me today?', 'How many jobs did we book last week?', 'Which invoices are still open?', 'Summarize last week for my business partner'];
+  $('#askSugg').innerHTML = SUGG.map(function (s) { return '<button type="button">' + esc(s) + '</button>'; }).join('');
+  [].slice.call($('#askSugg').querySelectorAll('button')).forEach(function (b) { b.addEventListener('click', function () { ask(b.textContent); }); });
+  function openAsk(on) { askEl.classList.toggle('on', on); askEl.setAttribute('aria-hidden', on ? 'false' : 'true'); if (on) setTimeout(function () { askIn.focus(); }, 300); }
+  addEventListener('keydown', function (e) { if (e.key === 'Escape' && askEl.classList.contains('on')) openAsk(false); });
+  var samplePromise = (window.claude && typeof window.claude.use === 'function') ? window.claude.use('sample').catch(function () { return null; }) : Promise.resolve(null);
+  var askTurns = [], askBusy = false, sampleOff = false;
+  function bubble(cls, text) { var d = document.createElement('div'); d.className = cls; d.textContent = text; askBody.appendChild(d); askBody.scrollTop = askBody.scrollHeight; return d; }
+
+  // the data tools Claude can read from (all sample data)
+  var DATA_TOOLS = [
+    { name: 'get_week_summary', description: 'Totals for one week from the Honey Reports: calls, jobs booked, dollars paid, median lead reply in seconds, no-show %, days to get paid, conversations handled. weeks_ago 0 is last week.', inputSchema: { type: 'object', properties: { weeks_ago: { type: 'number' } } },
+      execute: function (i) { var w = WEEKS[Math.max(0, Math.min(5, Math.round(+i.weeks_ago || 0)))]; return { week: range(w), calls_answered: w.calls, jobs_booked: w.booked, paid_dollars: w.paid, median_lead_reply_seconds: w.reply, no_show_percent: w.noshow, days_to_get_paid: w.dtp, conversations_handled: w.convos, leads: w.leads }; } },
+    { name: 'get_today', description: 'Today so far: calls answered, jobs booked, dollars paid, and the open items that need the owner.', inputSchema: { type: 'object', properties: {} },
+      execute: function () { return { calls_answered: live.calls, jobs_booked: live.booked, paid_dollars: live.paid, needs_you: needs().map(function (c) { return { bee: BEE[c.bee].name, about: c.summary, customer: c.who.name }; }) }; } },
+    { name: 'search_conversations', description: 'Search this week\'s conversations by text (customer name, topic) and optional bee id (bea, miles, ruby, june, otis). Returns up to 10 with time, bee, customer, outcome and summary.', inputSchema: { type: 'object', properties: { query: { type: 'string' }, bee: { type: 'string' } } },
+      execute: function (i) { var q = String(i.query || '').toLowerCase(), b = String(i.bee || '').toLowerCase(); return CONVOS.filter(function (c) { return (!b || c.bee === b) && (!q || (c.who.name + ' ' + c.summary + ' ' + c.outcome + ' ' + c.kind).toLowerCase().indexOf(q) >= 0); }).slice(0, 10).map(function (c) { return { when: dayLabel(c.t) + ' ' + clock(c.t), bee: BEE[c.bee].name, customer: c.who.name, outcome: c.outcome, summary: c.summary }; }); } },
+    { name: 'open_invoices', description: 'Invoices Otis is still chasing, with amount, days overdue and status.', inputSchema: { type: 'object', properties: {} },
+      execute: function () { return [{ invoice: '#1051', customer: 'invoice question, reminders paused', amount: 640, status: 'disputed, with Luis' }, { invoice: '#1048', customer: 'Ana Reyes', amount: 1180, days_overdue: 3, status: 'second reminder sent' }, { invoice: '#1046', customer: 'Tom Ward', amount: 450, days_overdue: 0, status: 'due Friday' }]; } }
+  ];
+  function canned(q) {
+    q = q.toLowerCase();
+    var n = needs(), w = WEEKS[0];
+    if (/need|today|waiting/.test(q)) return n.length ? n.length + ' things need you today:\n' + n.map(function (c) { return '• ' + BEE[c.bee].name + ': ' + c.summary; }).join('\n') : 'Nothing needs you right now.';
+    if (/book|jobs/.test(q)) return 'Last week (' + range(w) + ') your bees booked ' + w.booked + ' jobs: Bea booked ' + Math.round(w.booked * .7) + ' inspections from calls and chats, and Miles set ' + Math.round(w.booked * .3) + ' estimates from new leads.';
+    if (/invoice|paid|owe|open/.test(q)) return 'Otis is chasing 3 invoices: #1048 ($1,180, 3 days overdue, second reminder sent), #1046 ($450, due Friday), and #1051 ($640), which is paused because the customer questioned it. Luis has that one.';
+    if (/summar|partner|week/.test(q)) return 'Last week in one paragraph: Bea answered all ' + w.calls + ' calls, Miles replied to ' + w.leads + ' leads in a median ' + w.reply + ' seconds, and together they booked ' + w.booked + ' jobs. Ruby kept no-shows at ' + w.noshow + '%, and Otis collected ' + money(w.paid) + ', with invoices paid in ' + w.dtp + ' days on average. ' + w.convos + ' conversations handled in all.';
+    return null;
+  }
+  async function ask(text) {
+    text = String(text || '').trim().slice(0, 300); if (!text || askBusy) return;
+    askBusy = true; askForm.querySelector('.send').disabled = true;
+    bubble('q', text);
+    var dots = document.createElement('div'); dots.className = 'a'; dots.innerHTML = '<span class="dots"><i></i><i></i><i></i></span>'; askBody.appendChild(dots); askBody.scrollTop = askBody.scrollHeight;
+    var sample = sampleOff ? null : await Promise.race([samplePromise, new Promise(function (r) { setTimeout(function () { r(null); }, 3000); })]);
+    try {
+      if (sample) {
+        askNote.textContent = 'Answers come from Claude reading this sample shift log.';
+        var lead = 'You are "Ask the hive" inside the hive app for Harper Roofing, a sample roofing business served by Bizzy Bee\'s AI employees (Bea front desk, Miles follow-up, Ruby scheduling, June reviews (on trial shift), Otis billing, Penny marketing (starts next week)). The owner is Dana. Answer the owner\'s question using the tools, which read the shift log and Honey Reports (all sample data). Be brief: 1 to 4 short sentences or a short list, plain text, no markdown headings, numbers exact from the tools. If the data doesn\'t cover it, say so plainly.';
+        askTurns.push({ role: 'user', content: text });
+        var msgs = [{ role: 'user', content: lead }].concat(askTurns.slice(-8));
+        var res = await sample(msgs, { modelTier: 'quick', cache: false, tools: DATA_TOOLS, onText: function (u) { dots.textContent = u.text; askBody.scrollTop = askBody.scrollHeight; } });
+        dots.textContent = res.text; askTurns.push({ role: 'assistant', content: res.text });
+      } else {
+        askNote.textContent = 'In this view, Ask the hive answers the suggested questions from the sample data.';
+        await new Promise(function (r) { setTimeout(r, 700); });
+        dots.textContent = canned(text) || 'In this preview I can answer the suggested questions. Try one of those, or open the inbox and search.';
+      }
+    } catch (err) {
+      var code = err && err.code;
+      if (['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed', 'tools_unavailable'].indexOf(code) >= 0) { sampleOff = true; askTurns.pop(); dots.textContent = canned(text) || 'Live answers are off in this view. Try one of the suggested questions.'; }
+      else if (code === 'rate_limited') { askTurns.pop(); dots.textContent = 'Too many questions at once. Try again in a minute.'; }
+      else { askTurns.pop(); dots.textContent = canned(text) || 'That didn\'t go through. Try again.'; }
+    } finally { askBusy = false; askForm.querySelector('.send').disabled = false; }
+  }
+  askForm.addEventListener('submit', function (e) { e.preventDefault(); var v = askIn.value; askIn.value = ''; ask(v); });
+
+  route();
+})();
+</script>
+</body>
+</html>

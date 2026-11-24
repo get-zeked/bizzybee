@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://bizzybee.thinkabstrakt.com/sitemap.xml

@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bizzy Bee · AI employees for service businesses</title>
+<meta name="description" content="Bizzy Bee gives service businesses AI employees that answer every call, follow up on every lead and keep the calendar full. Real people set them up and keep watch.">
+<link rel="canonical" href="https://bizzybee.thinkabstrakt.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bizzy Bee">
+<meta property="og:title" content="Bizzy Bee · AI employees for service businesses">
+<meta property="og:description" content="Bizzy Bee gives service businesses AI employees that answer every call, follow up on every lead and keep the calendar full. Real people set them up and keep watch.">
+<meta property="og:url" content="https://bizzybee.thinkabstrakt.com/">
+<meta property="og:image" content="https://bizzybee.thinkabstrakt.com/og/home.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B0B0F">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+/* ---------- hero */
+.hero { position: relative; padding-block: clamp(40px, 6vw, 88px) clamp(64px, 8vw, 120px); overflow: hidden; }
+.hero > .wrap { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr); gap: clamp(36px, 5vw, 80px); align-items: center; }
+@media (max-width: 1040px) { .hero > .wrap { grid-template-columns: minmax(0, 1fr); } }
+.hero h1 { font-size: clamp(3.6rem, 1.2rem + 7.4vw, 9rem); margin: 26px 0 28px; }
+.hero h1 .ln { display: block; overflow: hidden; padding-bottom: .06em; }
+.hero h1 .ln > span { display: inline-block; animation: rise 1s var(--ease) both; }
+.hero h1 .ln:nth-child(2) > span { animation-delay: .12s; color: var(--honey); }
+.hero .lead { max-width: 34ch; }
+.proof { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: 40px; padding-top: 26px; border-top: 1px solid var(--line); }
+.proof div { display: grid; gap: 2px; }
+.proof b { font: 800 1.7rem/1 var(--f-display); letter-spacing: -0.03em; }
+.proof span { color: var(--fg-3); font-size: .875rem; }
+
+/* demo tabs (scripted mode) */
+.dtabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 12px; border-bottom: 1px solid var(--line); }
+.dtab { background: none; border: 0; padding: 10px 10px 12px; border-radius: 14px; text-align: left; cursor: pointer; display: grid; gap: 8px; transition: background-color .2s; }
+.dtab:hover { background: var(--ink-3); }
+.dtab .t { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: .875rem; color: var(--fg-2); }
+.dtab .t small { color: var(--fg-3); font-weight: 500; }
+.dtab.on .t { color: var(--fg); }
+.dtab .bar { height: 3px; border-radius: 3px; background: var(--line-2); overflow: hidden; }
+.dtab .bar i { display: block; height: 100%; width: 0; background: var(--honey); }
+.dtab.done .bar i { width: 100%; }
+@media (max-width: 480px) { .dtab .t small { display: none; } .dfoot .mono.biz { display: none; } }
+
+/* live mode: you text Bea */
+.livebar { display: none; align-items: center; gap: 10px; padding: 12px 14px 12px 18px; border-bottom: 1px solid var(--line); }
+.livebar .pill { background: var(--ok-soft); color: var(--ok); }
+.livebar span.t { color: var(--fg-2); font-size: .85rem; }
+.livebar button { margin-left: auto; background: none; border: 1px solid var(--line-2); color: var(--fg-2); border-radius: 999px; padding: 7px 12px; font: 500 .8rem/1 var(--f-body); cursor: pointer; }
+.livebar button:hover { color: var(--fg); border-color: var(--fg-3); }
+@media (max-width: 520px) { .livebar span.t { display: none; } }
+.compose { display: none; padding: 12px 14px 14px; border-top: 1px solid var(--line); background: var(--ink); }
+.sugg { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 10px; }
+.sugg::-webkit-scrollbar { display: none; }
+.sugg button { flex: none; background: var(--ink-3); border: 1px solid var(--line-2); color: var(--fg); border-radius: 999px; padding: 8px 12px; font: 500 .82rem/1 var(--f-body); cursor: pointer; transition: border-color .2s; }
+.sugg button:hover { border-color: var(--honey); }
+.compose form { display: flex; gap: 8px; }
+.compose input { flex: 1; min-width: 0; min-height: 46px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--ink-2); color: var(--fg); font: 400 .95rem/1 var(--f-body); }
+.compose input:focus { outline: none; border-color: var(--honey); }
+.compose .send { width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--honey); color: var(--on-honey); cursor: pointer; display: grid; place-items: center; flex: none; transition: transform .2s var(--ease), opacity .2s; }
+.compose .send:hover { transform: scale(1.06); }
+.compose .send[disabled] { opacity: .45; cursor: default; transform: none; }
+.compose .send svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.compose .how { margin-top: 10px; color: var(--fg-3); font-size: .78rem; line-height: 1.4; }
+.demo.is-live .dtabs { display: none; }
+.demo.is-live .livebar { display: flex; }
+.demo.is-live .compose { display: block; }
+.demo.is-live .thread { height: 400px; overflow-y: auto; justify-content: flex-start; scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
+.demo.is-live .thread::before { display: none; }
+.demo.is-live .thread > :first-child { margin-top: auto; }
+.trybtn { background: var(--honey); color: var(--on-honey); border: 0; border-radius: 999px; padding: 7px 12px; font: 600 .78rem/1 var(--f-body); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: transform .2s var(--ease); }
+.trybtn:hover { transform: translateY(-1px); }
+.demo.is-live .trybtn { display: none; }
+.demo .m.tool { align-self: center; display: inline-flex; align-items: center; gap: 8px; background: var(--ink-3); border: 1px solid var(--line-2); color: var(--fg-2); font: 500 .72rem/1.3 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; padding: 7px 12px; border-radius: 999px; }
+.demo .m.tool::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--honey); }
+.trycue { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 18px; color: var(--fg-3); font-size: .9rem; position: relative; z-index: 1; }
+.trycue a { color: var(--honey); font-weight: 600; text-decoration: none; }
+.trycue a:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+/* ---------- tape */
+.tape { background: var(--honey); color: var(--on-honey); transform: rotate(-1.6deg); margin: 0 -2%; padding: 18px 0; overflow: hidden; position: relative; z-index: 2; }
+.tape .track { display: flex; width: max-content; animation: slide 38s linear infinite; }
+.tape span { display: inline-flex; align-items: center; gap: 28px; padding-right: 28px; font: 800 clamp(1.4rem, 1rem + 1.4vw, 2.3rem)/1 var(--f-display); letter-spacing: -0.03em; white-space: nowrap; }
+.tape span::after { content: ""; width: 18px; height: 21px; background: var(--on-honey); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
+@keyframes slide { to { transform: translateX(-50%); } }
+
+/* statement */
+.statement { font: 800 clamp(2.2rem, 1.1rem + 3.8vw, 5rem)/1.02 var(--f-display); letter-spacing: -0.04em; max-width: 18ch; }
+.statement .w { transition: color .35s; }
+.statement .w.dim { color: #3A3944; }
+.statement .w.hl:not(.dim) { color: var(--honey); }
+
+/* industries strip */
+.inds { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: clamp(36px, 5vw, 80px); align-items: center; }
+@media (max-width: 900px) { .inds { grid-template-columns: minmax(0, 1fr); } }
+.inds .chips { gap: 10px; }
+.inds .chip { padding: 12px 20px; font-size: 1rem; }
+</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "Bizzy Bee", "url": "https://bizzybee.thinkabstrakt.com", "logo": "https://bizzybee.thinkabstrakt.com/icon-512.png", "email": "hello@thinkabstrakt.com", "slogan": "Good help, finally."}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Will my customers know they're talking to AI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Every bee introduces itself as your business's AI assistant and says so again if anyone asks. Customers mostly care that someone picked up and got it right."}}, {"@type": "Question", "name": "What if a bee doesn't know the answer?", "acceptedAnswer": {"@type": "Answer", "text": "It says so, takes a clear message and hands the conversation to you or your Beekeeper. Bees don't guess on prices, warranties or anything outside your rules."}}, {"@type": "Question", "name": "Do I need new software?", "acceptedAnswer": {"@type": "Answer", "text": "No. Bees work inside what you already use: your phone number, calendar, customer list and invoicing. Your Beekeeper connects it all during setup."}}, {"@type": "Question", "name": "How long does setup take?", "acceptedAnswer": {"@type": "Answer", "text": "Most bees start a trial shift within five business days of the first call. You approve their work during the trial, and most are fully on shift by the end of week two."}}, {"@type": "Question", "name": "Is there a contract?", "acceptedAnswer": {"@type": "Answer", "text": "No. Plans are month to month and you can cancel with one email. If a bee isn't earning its keep, we want to hear about it early."}}, {"@type": "Question", "name": "What happens to my customers' information?", "acceptedAnswer": {"@type": "Answer", "text": "We use it to do your work and nothing else. It's never used to train models for other businesses, and you can export or delete it whenever you like."}}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Bizzy Bee home"><svg class="bb-lockup" viewBox="0 0 5177.1 1264.3" aria-hidden="true"><path class="bb-b" style="fill:var(--bb-body)" d="M122 190.9L406.7 190.9C539.4 190.9 646.9 298.4 646.9 431.1C646.9 475.6 634.8 517.4 613.6 553.2C765.9 556.4 888.4 680.9 888.4 834C888.4 989.1 762.7 1114.9 607.5 1114.9L122 1114.9C54.6 1114.9 0 1060.2 0 992.8L0 312.9C0 245.5 54.6 190.9 122 190.9ZM258.6 865.1C231.6 865.1 209.7 887 209.7 914C209.7 941.1 231.6 963 258.6 963L703.5 963C730.5 963 752.4 941.1 752.4 914C752.4 887 730.5 865.1 703.5 865.1ZM258.6 693.5C231.6 693.5 209.7 715.4 209.7 742.5C209.7 769.5 231.6 791.4 258.6 791.4L703.5 791.4C730.5 791.4 752.4 769.5 752.4 742.5C752.4 715.4 730.5 693.5 703.5 693.5ZM223.7 340.8L223.7 544.2L376.8 544.2C433 544.2 478.5 498.7 478.5 442.5C478.5 386.4 433 340.8 376.8 340.8Z"/><path class="bb-w" style="fill:var(--bb-wing)" d="M683.7 512Q695.2 472.7 695.2 431.1Q695.2 367.2 668.6 309.8Q644.7 258.4 603.4 220Q600.5 217.3 599.9 213.3Q599.3 209.4 601.2 205.9Q606.2 197.3 615 180.5Q639.4 134.1 654.9 115.1Q692.9 68.6 735.5 42.4Q786.8 10.8 836.6 3.3Q864.9 -1 891.5 0.3Q921.8 1.9 944.3 10.6Q968.6 20 991.2 38Q1014.3 56.3 1028 77.4Q1041.2 97.8 1048.3 127Q1054.9 153.8 1054.8 181.3Q1054.6 226.2 1027.3 286.1Q1007.6 329.3 966.1 375.8Q933.5 412.2 883.6 447Q837.7 478.9 788.3 499.5Q765.5 508.9 714.8 521.8Q705 524.3 697.6 526.3Q693.1 527.5 689 525.1Q684.9 522.7 683.7 518.1Q682.8 515.1 683.7 512Z"/><path class="bb-t" style="fill:var(--bb-word)" d="M1086.4 1108.3L1086.4 448.3L1352.4 448.3Q1413.4 448.3 1460.9 459.3Q1508.4 470.3 1541.9 491.8Q1575.4 513.3 1592.9 545.3Q1610.4 577.3 1610.4 620.3Q1610.4 660.3 1593.9 692.3Q1577.4 724.3 1540.9 743.8Q1504.4 763.3 1445.4 768.3L1445.4 777.3Q1546.4 782.3 1591.9 824.3Q1637.4 866.3 1637.4 935.3Q1637.4 993.3 1607.4 1031.3Q1577.4 1069.3 1519.9 1088.8Q1462.4 1108.3 1377.4 1108.3ZM3576.4 1108.3L3576.4 448.3L3842.4 448.3Q3903.4 448.3 3950.9 459.3Q3998.4 470.3 4031.9 491.8Q4065.4 513.3 4082.9 545.3Q4100.4 577.3 4100.4 620.3Q4100.4 660.3 4083.9 692.3Q4067.4 724.3 4030.9 743.8Q3994.4 763.3 3935.4 768.3L3935.4 777.3Q4036.4 782.3 4081.9 824.3Q4127.4 866.3 4127.4 935.3Q4127.4 993.3 4097.4 1031.3Q4067.4 1069.3 4009.9 1088.8Q3952.4 1108.3 3867.4 1108.3ZM3043.4 1264.3Q3013.4 1264.3 2977.4 1259.3Q2941.4 1254.3 2905.4 1243.3Q2869.4 1232.3 2838.4 1215.3L2875.4 1052.3Q2911.4 1086.3 2955.9 1100.3Q3000.4 1114.3 3035.4 1114.3Q3084.4 1114.3 3117.9 1094.8Q3151.4 1075.3 3168.4 1037.8Q3185.4 1000.3 3185.4 946.3L3185.4 854.3L3176.4 854.3Q3174.4 924.3 3153.9 968.8Q3133.4 1013.3 3098.4 1034.3Q3063.4 1055.3 3017.4 1055.3Q2960.4 1055.3 2922.9 1026.3Q2885.4 997.3 2866.4 939.3Q2847.4 881.3 2847.4 794.3L2847.4 580.3L3008.4 580.3L3008.4 752.3Q3008.4 837.3 3026.4 876.3Q3044.4 915.3 3083.4 915.3Q3103.4 915.3 3118.9 904.8Q3134.4 894.3 3144.4 872.8Q3154.4 851.3 3159.4 818.8Q3164.4 786.3 3164.4 743.3L3164.4 580.3L3325.4 580.3L3325.4 952.3Q3325.4 1006.3 3314.4 1053.8Q3303.4 1101.3 3281.4 1139.8Q3259.4 1178.3 3225.9 1206.3Q3192.4 1234.3 3146.9 1249.3Q3101.4 1264.3 3043.4 1264.3ZM4419.4 1122.3Q4344.4 1122.3 4293.9 1100.8Q4243.4 1079.3 4212.4 1041.8Q4181.4 1004.3 4167.9 956.3Q4154.4 908.3 4154.4 855.3Q4154.4 798.3 4168.9 746.3Q4183.4 694.3 4213.9 653.8Q4244.4 613.3 4292.9 589.8Q4341.4 566.3 4409.4 566.3Q4477.4 566.3 4525.9 589.8Q4574.4 613.3 4603.4 655.3Q4632.4 697.3 4640.9 752.3Q4649.4 807.3 4638.4 871.3L4311.4 876.4Q4315.5 935.3 4337.4 965.3Q4364.4 1002.3 4420.4 1002.3Q4444.4 1002.3 4460.4 996.3Q4476.4 990.3 4486.4 978.8Q4496.4 967.3 4500.4 950.8Q4504.4 934.3 4503.4 913.3L4651.4 921.3Q4654.4 954.3 4644.9 989.3Q4635.4 1024.3 4609.4 1054.3Q4583.4 1084.3 4536.9 1103.3Q4490.4 1122.3 4419.4 1122.3ZM4944.4 1122.3Q4869.4 1122.3 4818.9 1100.8Q4768.4 1079.3 4737.4 1041.8Q4706.4 1004.3 4692.9 956.3Q4679.4 908.3 4679.4 855.3Q4679.4 798.3 4693.9 746.3Q4708.4 694.3 4738.9 653.8Q4769.4 613.3 4817.9 589.8Q4866.4 566.3 4934.4 566.3Q5002.4 566.3 5050.9 589.8Q5099.4 613.3 5128.4 655.3Q5157.4 697.3 5165.9 752.3Q5174.4 807.3 5163.4 871.3L4836.4 876.4Q4840.5 935.3 4862.4 965.3Q4889.4 1002.3 4945.4 1002.3Q4969.4 1002.3 4985.4 996.3Q5001.4 990.3 5011.4 978.8Q5021.4 967.3 5025.4 950.8Q5029.4 934.3 5028.4 913.3L5176.4 921.3Q5179.4 954.3 5169.9 989.3Q5160.4 1024.3 5134.4 1054.3Q5108.4 1084.3 5061.9 1103.3Q5015.4 1122.3 4944.4 1122.3ZM1884.4 1108.3L1884.4 972.3L2135.4 716.3L2135.4 710.3L1889.4 710.3L1889.4 580.3L2324.4 580.3L2324.4 717.3L2073.4 974.3L2073.4 978.3L2327.4 978.3L2327.4 1108.3ZM2367.4 1108.3L2367.4 972.3L2618.4 716.3L2618.4 710.3L2372.4 710.3L2372.4 580.3L2807.4 580.3L2807.4 717.3L2556.4 974.3L2556.4 978.3L2810.4 978.3L2810.4 1108.3ZM1678.4 1108.3L1678.4 580.3L1840.4 580.3L1840.4 1108.3ZM1248.4 978.3L1370.4 978.3Q1421.4 978.3 1449.4 959.8Q1477.4 941.3 1477.4 907.3Q1477.4 869.3 1445.9 850.8Q1414.4 832.3 1351.4 832.3L1248.4 832.3ZM3738.4 978.3L3860.4 978.3Q3911.4 978.3 3939.4 959.8Q3967.4 941.3 3967.4 907.3Q3967.4 869.3 3935.9 850.8Q3904.4 832.3 3841.4 832.3L3738.4 832.3ZM1248.4 722.3L1335.4 722.3Q1392.4 722.3 1422.4 703.3Q1452.4 684.3 1452.4 647.3Q1452.4 612.3 1425.4 594.8Q1398.4 577.3 1344.4 577.3L1248.4 577.3ZM3738.4 722.3L3825.4 722.3Q3882.4 722.3 3912.4 703.3Q3942.4 684.3 3942.4 647.3Q3942.4 612.3 3915.4 594.8Q3888.4 577.3 3834.4 577.3L3738.4 577.3ZM1758.4 542.3Q1712.4 542.3 1687.9 522.8Q1663.4 503.3 1663.4 466.3Q1663.4 428.3 1687.9 408.8Q1712.4 389.3 1758.4 389.3Q1805.4 389.3 1829.9 409.3Q1854.4 429.3 1854.4 466.3Q1854.4 502.3 1829.9 522.3Q1805.4 542.3 1758.4 542.3ZM4314.7 788.1L4495.7 784.6Q4494.8 770.1 4491.9 757.8Q4484.4 726.3 4464.4 709.8Q4444.4 693.3 4409.4 693.3Q4372.4 693.3 4350.4 712.3Q4328.4 731.3 4319.4 765.8Q4316.7 776.3 4314.7 788.1ZM4839.7 788.1L5020.7 784.6Q5019.8 770.1 5016.9 757.8Q5009.4 726.3 4989.4 709.8Q4969.4 693.3 4934.4 693.3Q4897.4 693.3 4875.4 712.3Q4853.4 731.3 4844.4 765.8Q4841.7 776.3 4839.7 788.1Z"/></svg></a>
+    <nav class="links" aria-label="Main">
+      <div class="nav-item has-drop"><a class="nav-link" href="hive.html">The hive</a>
+        <div class="drop"><a href="bea.html"><span class="av">B</span><span><b>Bea</b><small>Front desk</small></span></a><a href="miles.html"><span class="av">M</span><span><b>Miles</b><small>Follow-up</small></span></a><a href="ruby.html"><span class="av">R</span><span><b>Ruby</b><small>Scheduling</small></span></a><a href="june.html"><span class="av">J</span><span><b>June</b><small>Reviews</small></span></a><a href="otis.html"><span class="av">O</span><span><b>Otis</b><small>Billing</small></span></a><a href="penny.html"><span class="av">P</span><span><b>Penny</b><small>Marketing</small></span></a><a class="all" href="hive.html">Meet the whole hive <span aria-hidden="true">&rarr;</span></a></div></div>
+      <div class="nav-item has-drop"><a class="nav-link" href="industries.html">Industries</a>
+        <div class="drop three"><a class="ind" href="roofing.html">Roofing</a><a class="ind" href="hvac.html">HVAC</a><a class="ind" href="plumbing.html">Plumbing</a><a class="ind" href="electrical.html">Electrical</a><a class="ind" href="auto-body.html">Auto body and collision</a><a class="ind" href="dental.html">Dental practices</a><a class="ind" href="med-spa.html">Med spas</a><a class="ind" href="insurance.html">Insurance agencies</a><a class="ind" href="property-management.html">Property management</a><a class="all" href="industries.html">All industries <span aria-hidden="true">&rarr;</span></a></div></div>
+      <div class="nav-item"><a class="nav-link" href="how-it-works.html">How it works</a></div>
+      <div class="nav-item"><a class="nav-link" href="pricing.html">Pricing</a></div>
+    </nav>
+    <div class="cta"><a class="btn btn-honey" href="book.html">Book a call</a><button class="menu-btn" type="button" aria-controls="menu" aria-expanded="false" aria-label="Open menu"><i></i></button></div>
+  </div>
+</header>
+<div class="menu" id="menu" inert>
+  <div class="wrap">
+    <div class="grp"><a class="big" href="index.html">Home</a><a class="big" href="hive.html">The hive</a><a class="big" href="how-it-works.html">How it works</a><a class="big" href="pricing.html">Pricing</a><a class="big" href="index.html#try">Try Bea live</a></div>
+    <div class="grp"><span class="mono">The bees</span><div class="bees"><a href="bea.html"><span class="av">B</span><span>Bea<small>Front desk</small></span></a><a href="miles.html"><span class="av">M</span><span>Miles<small>Follow-up</small></span></a><a href="ruby.html"><span class="av">R</span><span>Ruby<small>Scheduling</small></span></a><a href="june.html"><span class="av">J</span><span>June<small>Reviews</small></span></a><a href="otis.html"><span class="av">O</span><span>Otis<small>Billing</small></span></a><a href="penny.html"><span class="av">P</span><span>Penny<small>Marketing</small></span></a></div></div>
+    <div class="grp"><span class="mono">Industries</span><div class="inds"><a href="roofing.html">Roofing</a><a href="hvac.html">HVAC</a><a href="plumbing.html">Plumbing</a><a href="electrical.html">Electrical</a><a href="auto-body.html">Auto body and collision</a><a href="dental.html">Dental practices</a><a href="med-spa.html">Med spas</a><a href="insurance.html">Insurance agencies</a><a href="property-management.html">Property management</a></div></div>
+    <a class="btn btn-honey" href="book.html">Book a 20-minute call</a>
+  </div>
+</div>
+<main id="main">
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="status"><span class="live"></span><b>6 AI employees</b> ready to start this week</span>
+      <h1><span class="ln"><span>Good help,</span></span><span class="ln"><span>finally.</span></span></h1>
+      <p class="lead">Bizzy Bee gives your business a team of <b>AI employees</b>. They answer every call, chase every lead and keep the calendar full, day and night. Real people set them up and keep watch.</p>
+      <div class="cta-row">
+        <a class="btn btn-honey" href="hive.html">Meet the hive <span class="ar" aria-hidden="true">&rarr;</span></a>
+        <a class="btn btn-ghost" href="#calc">What are missed calls costing me?</a>
+      </div>
+      <div class="proof">
+        <div><b>24/7</b><span>On shift, nights and weekends</span></div>
+        <div><b>~1 week</b><span>From first call to first shift</span></div>
+        <div><b>$0</b><span>Setup, contracts or new software</span></div>
+      </div>
+    </div>
+
+    <div class="demo-wrap" id="try">
+      <div class="rings" aria-hidden="true"><i></i><i></i><i></i></div>
+      <article class="demo" id="demo" aria-label="Live demo with sample data: a bee handling a customer">
+        <div class="dtabs" role="tablist">
+          <button class="dtab on" role="tab" aria-selected="true" data-i="0"><span class="t"><span class="av">B</span>Bea <small>Call</small></span><span class="bar"><i></i></span></button>
+          <button class="dtab" role="tab" aria-selected="false" data-i="1"><span class="t"><span class="av">M</span>Miles <small>Lead</small></span><span class="bar"><i></i></span></button>
+          <button class="dtab" role="tab" aria-selected="false" data-i="2"><span class="t"><span class="av">O</span>Otis <small>Invoice</small></span><span class="bar"><i></i></span></button>
+        </div>
+        <div class="livebar"><span class="pill"><span class="dot"></span>Live</span><span class="t">You're texting Bea. Harper Roofing is a sample business.</span><button type="button" id="liveExit">Back to demo</button></div>
+        <div class="dhead">
+          <span class="ic" id="dIcon"><svg viewBox="0 0 24 24"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A15 15 0 013 6a2 2 0 012-2z"/></svg></span>
+          <div><b id="dTitle">Incoming call</b><span id="dSub">(214) 555-0187 &middot; New caller, Plano</span></div>
+          <span class="mono tab" id="dTime">0:42</span>
+        </div>
+        <div class="thread" id="thread" aria-live="polite">
+          <div class="m sys">Bea picked up in 2 seconds</div>
+          <div class="m them">Hi, I think I've got a leak over the garage after last night's storm.</div>
+          <div class="m bee">Sorry to hear that. I can get an inspector out tomorrow at 10:30, or Thursday at 2. Which works better?</div>
+          <div class="m them">Tomorrow at 10:30.</div>
+          <div class="m bee">You're booked. You'll get a text tonight with your inspector's name.</div>
+          <div class="m res">Booked &middot; Tue 10:30 AM &middot; on the calendar</div>
+        </div>
+        <div class="compose">
+          <div class="sugg" id="sugg">
+            <button type="button">My roof is leaking after the storm</button>
+            <button type="button">Do you work with insurance?</button>
+            <button type="button">How much is a new roof?</button>
+            <button type="button">Are you a real person?</button>
+            <button type="button">Can someone come Thursday?</button>
+          </div>
+          <form id="liveForm" autocomplete="off">
+            <label class="sr" for="liveIn">Message Bea</label>
+            <input id="liveIn" maxlength="400" placeholder="Text Bea like you're a customer...">
+            <button class="send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </form>
+          <p class="how" id="liveHow">Bea is running on a real AI model with Harper Roofing's sample playbook. Bookings go on a pretend calendar.</p>
+        </div>
+        <div class="dfoot"><span class="mono">Live demo &middot; sample data</span><button class="trybtn" type="button" id="tryBtn">Your turn: text Bea <span aria-hidden="true">&rarr;</span></button></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="tape" aria-hidden="true"><div class="track">
+  <span>Answers every call</span><span>Replies to leads in 60 seconds</span><span>Fills the calendar</span><span>Chases invoices</span><span>Gets you reviews</span><span>Posts every week</span>
+  <span>Answers every call</span><span>Replies to leads in 60 seconds</span><span>Fills the calendar</span><span>Chases invoices</span><span>Gets you reviews</span><span>Posts every week</span>
+</div></div>
+
+<section class="sec">
+  <div class="wrap">
+    <span class="kicker">The problem</span>
+    <p class="statement" id="statement" style="margin-top:28px">You're great at the work. It's the <span class="hl">phone calls,</span> the <span class="hl">follow-ups</span> and the <span class="hl">invoices</span> that slip when you're busy. That's exactly where the bees start.</p>
+  </div>
+</section>
+
+<section class="sec flush" id="hive">
+  <div class="wrap">
+    <div class="sec-head split">
+      <div><span class="kicker">The hive</span><h2 class="h2" style="margin-top:22px">Six bees.<br><em>One job each.</em></h2></div>
+      <p class="sub">Every bee is trained on one job and judged on one number. Hire the one you need most, or put the whole hive to work.</p>
+    </div>
+    <div class="hive"><a class="bee rv" href="bea.html">
+  <div class="vis"><span class="tag">On a call</span><span class="tag r tab">0:42</span><div class="wave" aria-hidden="true"><i style="animation-delay:-.1s"></i><i style="animation-delay:-.5s"></i><i style="animation-delay:-.3s"></i><i style="animation-delay:-.8s"></i><i style="animation-delay:-.2s"></i><i style="animation-delay:-.6s"></i><i style="animation-delay:-.9s"></i><i style="animation-delay:-.4s"></i><i style="animation-delay:-.7s"></i><i style="animation-delay:-.15s"></i><i style="animation-delay:-.55s"></i><i style="animation-delay:-.35s"></i><i style="animation-delay:-.85s"></i><i style="animation-delay:-.25s"></i><i style="animation-delay:-.65s"></i></div></div><span class="go" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+  <div class="body"><div class="who"><span class="av">B</span><div><h3>Bea</h3><div class="role">Front desk</div></div></div>
+    <p>Answers calls, texts and website chat around the clock, books jobs into your calendar and takes clean messages.</p>
+    <div class="meta"><span>Judged on <b>calls answered</b></span><span class="price">$449<small>/mo</small></span></div></div>
+</a>
+<a class="bee rv" href="miles.html">
+  <div class="vis"><span class="tag">New lead</span><span class="tag r tab">38 s reply</span><div class="bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i></div></div><span class="go" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+  <div class="body"><div class="who"><span class="av">M</span><div><h3>Miles</h3><div class="role">Follow-up</div></div></div>
+    <p>Replies to every new lead within a minute and follows up on open quotes until they book or say no.</p>
+    <div class="meta"><span>Judged on <b>reply time</b></span><span class="price">$349<small>/mo</small></span></div></div>
+</a>
+<a class="bee rv" href="ruby.html">
+  <div class="vis"><span class="tag">This week</span><span class="tag r tab">Full</span><div class="cal" aria-hidden="true"></div></div><span class="go" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+  <div class="body"><div class="who"><span class="av">R</span><div><h3>Ruby</h3><div class="role">Scheduling</div></div></div>
+    <p>Confirms appointments, sends reminders, fills cancellations from your waitlist and handles every reschedule.</p>
+    <div class="meta"><span>Judged on <b>no-shows</b></span><span class="price">$349<small>/mo</small></span></div></div>
+</a>
+<a class="bee rv" href="june.html">
+  <div class="vis"><span class="tag">New review</span><span class="tag r tab">4.9</span><div class="stars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div></div><span class="go" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+  <div class="body"><div class="who"><span class="av">J</span><div><h3>June</h3><div class="role">Reviews</div></div></div>
+    <p>Asks every customer for a review at the right moment, replies to every review and flags unhappy ones the same day.</p>
+    <div class="meta"><span>Judged on <b>reviews a month</b></span><span class="price">$349<small>/mo</small></span></div></div>
+</a>
+<a class="bee rv" href="otis.html">
+  <div class="vis"><span class="tag">Invoice #1042</span><span class="tag r tab">$8,640</span><div class="inv" aria-hidden="true"><i></i><i></i><i></i><i></i><b>PAID</b></div></div><span class="go" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+  <div class="body"><div class="who"><span class="av">O</span><div><h3>Otis</h3><div class="role">Billing</div></div></div>
+    <p>Sends the invoice the day the job is done, sends polite reminders until it's paid and keeps your books in sync.</p>
+    <div class="meta"><span>Judged on <b>days to get paid</b></span><span class="price">$349<small>/mo</small></span></div></div>
+</a>
+<a class="bee rv" href="penny.html">
+  <div class="vis"><span class="tag">Scheduled</span><span class="tag r tab">3 posts</span><div class="posts" aria-hidden="true"><i></i><i></i><i></i></div></div><span class="go" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+  <div class="body"><div class="who"><span class="av">P</span><div><h3>Penny</h3><div class="role">Marketing</div></div></div>
+    <p>Posts to your Google profile and socials every week, turns finished jobs into before-and-afters and sends your monthly email.</p>
+    <div class="meta"><span>Judged on <b>posts on time</b></span><span class="price">$349<small>/mo</small></span></div></div>
+</a></div>
+    <p class="more"><a class="link" href="hive.html">See how the bees hand work to each other <span aria-hidden="true">&rarr;</span></a></p>
+  </div>
+</section>
+
+<section class="sec alt" id="report">
+  <div class="wrap">
+    <div class="sec-head split">
+      <div><span class="kicker">The Honey Report</span><h2 class="h2" style="margin-top:22px">Every Monday,<br><em>in plain numbers.</em></h2></div>
+      <p class="sub">One email shows what each bee did last week and what it was worth. Here's a sample week for a roofing company.</p>
+    </div>
+    <div class="nums" data-countup>
+      <div class="num"><b class="tab" data-count="214">214</b><span><span class="av">B</span>calls answered, out of 214</span></div>
+      <div class="num"><b class="tab"><span data-count="41">41</span><em>s</em></b><span><span class="av">M</span>median reply to a new lead</span></div>
+      <div class="num"><b class="tab" data-count="37">37</b><span><span class="av">B</span>jobs booked onto the calendar</span></div>
+      <div class="num"><b class="tab"><em>$</em><span data-count="18420" data-fmt="k">18.4</span><em>k</em></b><span><span class="av">O</span>in invoices paid</span></div>
+    </div>
+    <div class="nums-note"><span class="mono">Sample data &middot; week of Nov 10 &ndash; 16</span><span class="mono">312 conversations handled</span></div>
+  </div>
+</section>
+
+<section class="sec calc" id="calc" data-calc>
+  <div class="wrap">
+    <div>
+      <span class="kicker">Missed-call math</span>
+      <h2 class="h2" style="margin-top:22px">What are missed calls costing you?</h2>
+      <p class="sub">Move the sliders to match a normal week. It's a rough estimate, but most owners are surprised.</p>
+      <div class="sliders">
+        <div class="sl"><label for="cMiss">Calls you miss a week <output data-o="miss" for="cMiss">10</output></label><input type="range" id="cMiss" data-k="miss" min="1" max="60" value="10"></div>
+        <div class="sl"><label for="cVal">Average job value <output data-o="val" for="cVal">$900</output></label><input type="range" id="cVal" data-k="val" min="100" max="15000" step="50" value="900"></div>
+        <div class="sl"><label for="cRate">Missed callers who'd have booked <output data-o="rate" for="cRate">30%</output></label><input type="range" id="cRate" data-k="rate" min="5" max="80" value="30"></div>
+      </div>
+    </div>
+    <div class="result" aria-live="polite">
+      <span class="mono">Estimated work you're missing</span>
+      <div class="big tab" data-o="big">$11,700</div>
+      <div class="per">a month, about <b data-o="year">$140,400</b> a year, from calls nobody picked up</div>
+      <div class="vs"><span>Bea answers every one of them for</span><b class="tab">$449/mo</b></div>
+      <a class="btn btn-honey" href="book.html?bees=bea">Put Bea on the phones <span class="ar" aria-hidden="true">&rarr;</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="industries">
+  <div class="wrap inds">
+    <div><span class="kicker">Industries</span><h2 class="h2 sm" style="margin-top:22px">Built for businesses <em>that live on the phone.</em></h2><p class="sub" style="margin-top:22px">Every bee learns your trade's words, services and rules before it takes a single call.</p></div>
+    <div class="rv"><div class="chips"><a class="chip" href="roofing.html">Roofing</a><a class="chip" href="hvac.html">HVAC</a><a class="chip" href="plumbing.html">Plumbing</a><a class="chip" href="electrical.html">Electrical</a><a class="chip" href="auto-body.html">Auto body and collision</a><a class="chip" href="dental.html">Dental practices</a><a class="chip" href="med-spa.html">Med spas</a><a class="chip" href="insurance.html">Insurance agencies</a><a class="chip" href="property-management.html">Property management</a></div><p class="more"><a class="link" href="industries.html">See every industry <span aria-hidden="true">&rarr;</span></a></p></div>
+  </div>
+</section>
+
+<section class="sec flush" id="keepers">
+  <div class="wrap"><div class="keep">
+  <div>
+    <span class="kicker">Beekeepers</span>
+    <h2 class="h2" style="margin-top:22px">Real people<br><em>stay in charge.</em></h2>
+    <p class="sub" style="margin-top:22px">Every account gets a Beekeeper: a real person on our team who sets up your bees, checks their work and picks up when you call.</p>
+    <div class="pts">
+      <div class="pt rv"><span class="n">01</span><div><h3>Your rules, in writing</h3><p>Decide what each bee can say, offer and promise. Prices, discounts, service areas, hours.</p></div></div>
+      <div class="pt rv"><span class="n">02</span><div><h3>A clean hand-off</h3><p>When a customer needs a person, the bee passes them to you with the whole conversation attached.</p></div></div>
+      <div class="pt rv"><span class="n">03</span><div><h3>Honest about being AI</h3><p>Every bee introduces itself as your AI assistant. None of them pretends to be a person.</p></div></div>
+    </div>
+  </div>
+  <div class="panel rv">
+    <div class="pane">
+      <div class="ph"><span class="av">B</span><b>Bea's rules</b><span class="mono">Sample</span></div>
+      <div class="rule"><span><strong>Answer after hours</strong> and on weekends</span><button class="sw" role="switch" aria-checked="true" aria-label="Answer after hours"></button></div>
+      <div class="rule"><span><strong>Book inspections</strong> in Dallas, Plano, Frisco</span><button class="sw" role="switch" aria-checked="true" aria-label="Book inspections"></button></div>
+      <div class="rule"><span><strong>Quote prices</strong> on the phone</span><button class="sw" role="switch" aria-checked="false" aria-label="Quote prices"></button></div>
+      <div class="rule"><span><strong>Insurance claims</strong> go to the office</span><button class="sw" role="switch" aria-checked="true" aria-label="Send insurance claims to the office"></button></div>
+    </div>
+    <div class="pane ho">
+      <div class="ph"><span class="av">B</span><b>Bea needs you</b><span class="pill warn">Hand-off</span></div>
+      <div class="q"><b>Customer:</b> "Is my 2019 roof still under warranty? The installer said 10 years."</div>
+      <div class="a">"Good question. Warranties go to our office, so I've sent them your details. Someone will call you this morning."</div>
+      <div class="row"><button class="btn btn-honey btn-sm" type="button">Call them back</button><button class="btn btn-ghost btn-sm" type="button">Ask my Beekeeper</button></div>
+    </div>
+  </div>
+</div></div>
+</section>
+
+<section class="sec" id="how">
+  <div class="wrap">
+    <div class="sec-head split">
+      <div><span class="kicker">How it works</span><h2 class="h2" style="margin-top:22px">On shift in<br><em>about a week.</em></h2></div>
+      <p class="sub">No new software to learn. Your Beekeeper does the setup and you sign off on every step.</p>
+    </div>
+    <div class="progress" aria-hidden="true"><i id="prog"></i></div>
+<ol class="steps" id="steps">
+  <li class="lit"><span class="sn">1</span><h3>Meet</h3><p>A 20-minute call. Tell us where the work piles up and we'll suggest the bees that fit.</p><span class="mono">Day 1</span></li>
+  <li class="lit"><span class="sn">2</span><h3>Train</h3><p>Your Beekeeper loads your services, prices, hours and tone into each bee's playbook.</p><span class="mono">Days 2 &ndash; 4</span></li>
+  <li class="lit"><span class="sn">3</span><h3>Trial shift</h3><p>Bees draft and you approve. Nothing reaches a customer without your yes.</p><span class="mono">Days 5 &ndash; 10</span></li>
+  <li class="lit"><span class="sn">4</span><h3>On shift</h3><p>Bees work on their own inside your rules. The Honey Report lands every Monday.</p><span class="mono">From week 2</span></li>
+</ol>
+    <p class="more"><a class="link" href="how-it-works.html">The whole process, step by step <span aria-hidden="true">&rarr;</span></a></p>
+  </div>
+</section>
+
+<section class="sec flush" id="pricing">
+  <div class="wrap">
+    <div class="sec-head split">
+      <div><span class="kicker">Pricing</span><h2 class="h2" style="margin-top:22px">Hire by the month.<br><em>Stop anytime.</em></h2></div>
+      <p class="sub">Setup, phone numbers and your Beekeeper come with every plan.</p>
+    </div>
+    <div class="plans">
+  <article class="plan rv">
+    <div class="top"><h3>One bee</h3></div>
+    <p class="for">For the one job that keeps slipping through the cracks.</p>
+    <div class="amt tab">$349<small>/mo</small></div><p class="pnote">Any one bee. Bea, who answers your phones, is $449.</p>
+    <ul><li>Bea, Miles, Ruby, June, Otis or Penny</li><li>Weekly Honey Report</li><li>A named Beekeeper</li><li>Unlimited conversations</li></ul>
+    <a class="btn btn-ghost" href="book.html?plan=one">Start with one bee</a>
+  </article>
+  <article class="plan hot rv rv-d1">
+    <div class="top"><h3>Crew</h3><span class="tag">Best value</span></div>
+    <p class="for">Phones, follow-up and scheduling covered. The front office, handled.</p>
+    <div class="amt tab">$999<small>/mo</small></div><p class="pnote">Any three bees, up to $148 off</p>
+    <ul><li>Bees that hand work to each other</li><li>Weekly Honey Report</li><li>A named Beekeeper</li><li>Monthly check-in call</li></ul>
+    <a class="btn btn-ink" href="book.html?plan=crew">Hire a crew <span class="ar" aria-hidden="true">&rarr;</span></a>
+  </article>
+  <article class="plan rv rv-d2">
+    <div class="top"><h3>Whole hive</h3></div>
+    <p class="for">All six bees working together across the whole business.</p>
+    <div class="amt tab">$1,690<small>/mo</small></div><p class="pnote">All six bees, $504 off</p>
+    <ul><li>Everything in Crew</li><li>Priority Beekeeper, same-day changes</li><li>Custom rules and connections</li><li>Quarterly planning session</li></ul>
+    <a class="btn btn-ghost" href="book.html?plan=hive">Talk about the hive</a>
+  </article>
+</div>
+    <p class="fine">Concept pricing. No contracts. Cancel with one email. <a class="link" href="pricing.html">Compare plans <span aria-hidden="true">&rarr;</span></a></p>
+  </div>
+</section>
+
+<section class="sec flush" id="faq">
+  <div class="wrap faq">
+    <div><span class="kicker">Questions</span><h2 class="h2" style="margin-top:22px">Fair<br><em>questions.</em></h2><p class="sub" style="margin-top:22px">Don't see yours? Ask a Beekeeper on the call.</p></div>
+    <div><details open><summary>Will my customers know they're talking to AI?<i aria-hidden="true"></i></summary><p>Yes. Every bee introduces itself as your business's AI assistant and says so again if anyone asks. Customers mostly care that someone picked up and got it right.</p></details>
+<details><summary>What if a bee doesn't know the answer?<i aria-hidden="true"></i></summary><p>It says so, takes a clear message and hands the conversation to you or your Beekeeper. Bees don't guess on prices, warranties or anything outside your rules.</p></details>
+<details><summary>Do I need new software?<i aria-hidden="true"></i></summary><p>No. Bees work inside what you already use: your phone number, calendar, customer list and invoicing. Your Beekeeper connects it all during setup.</p></details>
+<details><summary>How long does setup take?<i aria-hidden="true"></i></summary><p>Most bees start a trial shift within five business days of the first call. You approve their work during the trial, and most are fully on shift by the end of week two.</p></details>
+<details><summary>Is there a contract?<i aria-hidden="true"></i></summary><p>No. Plans are month to month and you can cancel with one email. If a bee isn't earning its keep, we want to hear about it early.</p></details>
+<details><summary>What happens to my customers' information?<i aria-hidden="true"></i></summary><p>We use it to do your work and nothing else. It's never used to train models for other businesses, and you can export or delete it whenever you like.</p></details></div>
+  </div>
+</section>
+
+<section class="close" id="book">
+  <div class="wrap">
+    <svg class="bigmark" viewBox="0 0 829.9 877.2" aria-hidden="true"><path class="bb-b" style="fill:var(--bb-body)" d="M96 150.2L320 150.2C424.4 150.2 509 234.8 509 339.2C509 374.2 499.4 407.1 482.8 435.2C602.6 437.8 699 535.7 699 656.2C699 778.2 600.1 877.2 478 877.2L96 877.2C43 877.2 0 834.2 0 781.2L0 246.2C0 193.1 43 150.2 96 150.2ZM203.5 680.7C182.2 680.7 165 697.9 165 719.2C165 740.4 182.2 757.7 203.5 757.7L553.5 757.7C574.8 757.7 592 740.4 592 719.2C592 697.9 574.8 680.7 553.5 680.7ZM203.5 545.7C182.2 545.7 165 562.9 165 584.2C165 605.4 182.2 622.7 203.5 622.7L553.5 622.7C574.8 622.7 592 605.4 592 584.2C592 562.9 574.8 545.7 553.5 545.7ZM176 268.2L176 428.2L296.5 428.2C340.7 428.2 376.5 392.4 376.5 348.2C376.5 304 340.7 268.2 296.5 268.2Z"/><path class="bb-w" style="fill:var(--bb-wing)" d="M538 402.8Q547 372 547 339.2Q547 288.9 526 243.7Q507.3 203.3 474.7 173.1Q472.4 170.9 472 167.8Q471.5 164.7 473.1 162Q476.9 155.2 483.9 142Q503.1 105.5 515.3 90.6Q545.2 54 578.7 33.4Q619 8.5 658.2 2.6Q680.5 -0.8 701.5 0.3Q725.2 1.5 743 8.4Q762.1 15.7 779.9 29.9Q798.1 44.3 808.8 60.9Q819.2 77 824.8 99.9Q830 121 829.9 142.7Q829.8 178 808.3 225.1Q792.8 259.1 760.1 295.7Q734.5 324.4 695.2 351.7Q659.1 376.8 620.2 393Q602.3 400.4 562.4 410.6Q554.7 412.5 548.9 414.1Q545.3 415 542.1 413.1Q538.9 411.3 537.9 407.7Q537.3 405.2 538 402.8Z"/></svg>
+    <span class="kicker">Get started</span>
+    <h2 style="margin-top:26px">Put a bee on the phones <em>this week.</em></h2>
+    <div class="row">
+      <a class="btn btn-honey" href="book.html">Book a 20-minute call <span class="ar" aria-hidden="true">&rarr;</span></a>
+      <p>You'll talk to a Beekeeper, not a bee.</p>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand"><a class="brand" href="index.html" aria-label="Bizzy Bee home"><svg class="bb-lockup" viewBox="0 0 5177.1 1264.3" aria-hidden="true"><path class="bb-b" style="fill:var(--bb-body)" d="M122 190.9L406.7 190.9C539.4 190.9 646.9 298.4 646.9 431.1C646.9 475.6 634.8 517.4 613.6 553.2C765.9 556.4 888.4 680.9 888.4 834C888.4 989.1 762.7 1114.9 607.5 1114.9L122 1114.9C54.6 1114.9 0 1060.2 0 992.8L0 312.9C0 245.5 54.6 190.9 122 190.9ZM258.6 865.1C231.6 865.1 209.7 887 209.7 914C209.7 941.1 231.6 963 258.6 963L703.5 963C730.5 963 752.4 941.1 752.4 914C752.4 887 730.5 865.1 703.5 865.1ZM258.6 693.5C231.6 693.5 209.7 715.4 209.7 742.5C209.7 769.5 231.6 791.4 258.6 791.4L703.5 791.4C730.5 791.4 752.4 769.5 752.4 742.5C752.4 715.4 730.5 693.5 703.5 693.5ZM223.7 340.8L223.7 544.2L376.8 544.2C433 544.2 478.5 498.7 478.5 442.5C478.5 386.4 433 340.8 376.8 340.8Z"/><path class="bb-w" style="fill:var(--bb-wing)" d="M683.7 512Q695.2 472.7 695.2 431.1Q695.2 367.2 668.6 309.8Q644.7 258.4 603.4 220Q600.5 217.3 599.9 213.3Q599.3 209.4 601.2 205.9Q606.2 197.3 615 180.5Q639.4 134.1 654.9 115.1Q692.9 68.6 735.5 42.4Q786.8 10.8 836.6 3.3Q864.9 -1 891.5 0.3Q921.8 1.9 944.3 10.6Q968.6 20 991.2 38Q1014.3 56.3 1028 77.4Q1041.2 97.8 1048.3 127Q1054.9 153.8 1054.8 181.3Q1054.6 226.2 1027.3 286.1Q1007.6 329.3 966.1 375.8Q933.5 412.2 883.6 447Q837.7 478.9 788.3 499.5Q765.5 508.9 714.8 521.8Q705 524.3 697.6 526.3Q693.1 527.5 689 525.1Q684.9 522.7 683.7 518.1Q682.8 515.1 683.7 512Z"/><path class="bb-t" style="fill:var(--bb-word)" d="M1086.4 1108.3L1086.4 448.3L1352.4 448.3Q1413.4 448.3 1460.9 459.3Q1508.4 470.3 1541.9 491.8Q1575.4 513.3 1592.9 545.3Q1610.4 577.3 1610.4 620.3Q1610.4 660.3 1593.9 692.3Q1577.4 724.3 1540.9 743.8Q1504.4 763.3 1445.4 768.3L1445.4 777.3Q1546.4 782.3 1591.9 824.3Q1637.4 866.3 1637.4 935.3Q1637.4 993.3 1607.4 1031.3Q1577.4 1069.3 1519.9 1088.8Q1462.4 1108.3 1377.4 1108.3ZM3576.4 1108.3L3576.4 448.3L3842.4 448.3Q3903.4 448.3 3950.9 459.3Q3998.4 470.3 4031.9 491.8Q4065.4 513.3 4082.9 545.3Q4100.4 577.3 4100.4 620.3Q4100.4 660.3 4083.9 692.3Q4067.4 724.3 4030.9 743.8Q3994.4 763.3 3935.4 768.3L3935.4 777.3Q4036.4 782.3 4081.9 824.3Q4127.4 866.3 4127.4 935.3Q4127.4 993.3 4097.4 1031.3Q4067.4 1069.3 4009.9 1088.8Q3952.4 1108.3 3867.4 1108.3ZM3043.4 1264.3Q3013.4 1264.3 2977.4 1259.3Q2941.4 1254.3 2905.4 1243.3Q2869.4 1232.3 2838.4 1215.3L2875.4 1052.3Q2911.4 1086.3 2955.9 1100.3Q3000.4 1114.3 3035.4 1114.3Q3084.4 1114.3 3117.9 1094.8Q3151.4 1075.3 3168.4 1037.8Q3185.4 1000.3 3185.4 946.3L3185.4 854.3L3176.4 854.3Q3174.4 924.3 3153.9 968.8Q3133.4 1013.3 3098.4 1034.3Q3063.4 1055.3 3017.4 1055.3Q2960.4 1055.3 2922.9 1026.3Q2885.4 997.3 2866.4 939.3Q2847.4 881.3 2847.4 794.3L2847.4 580.3L3008.4 580.3L3008.4 752.3Q3008.4 837.3 3026.4 876.3Q3044.4 915.3 3083.4 915.3Q3103.4 915.3 3118.9 904.8Q3134.4 894.3 3144.4 872.8Q3154.4 851.3 3159.4 818.8Q3164.4 786.3 3164.4 743.3L3164.4 580.3L3325.4 580.3L3325.4 952.3Q3325.4 1006.3 3314.4 1053.8Q3303.4 1101.3 3281.4 1139.8Q3259.4 1178.3 3225.9 1206.3Q3192.4 1234.3 3146.9 1249.3Q3101.4 1264.3 3043.4 1264.3ZM4419.4 1122.3Q4344.4 1122.3 4293.9 1100.8Q4243.4 1079.3 4212.4 1041.8Q4181.4 1004.3 4167.9 956.3Q4154.4 908.3 4154.4 855.3Q4154.4 798.3 4168.9 746.3Q4183.4 694.3 4213.9 653.8Q4244.4 613.3 4292.9 589.8Q4341.4 566.3 4409.4 566.3Q4477.4 566.3 4525.9 589.8Q4574.4 613.3 4603.4 655.3Q4632.4 697.3 4640.9 752.3Q4649.4 807.3 4638.4 871.3L4311.4 876.4Q4315.5 935.3 4337.4 965.3Q4364.4 1002.3 4420.4 1002.3Q4444.4 1002.3 4460.4 996.3Q4476.4 990.3 4486.4 978.8Q4496.4 967.3 4500.4 950.8Q4504.4 934.3 4503.4 913.3L4651.4 921.3Q4654.4 954.3 4644.9 989.3Q4635.4 1024.3 4609.4 1054.3Q4583.4 1084.3 4536.9 1103.3Q4490.4 1122.3 4419.4 1122.3ZM4944.4 1122.3Q4869.4 1122.3 4818.9 1100.8Q4768.4 1079.3 4737.4 1041.8Q4706.4 1004.3 4692.9 956.3Q4679.4 908.3 4679.4 855.3Q4679.4 798.3 4693.9 746.3Q4708.4 694.3 4738.9 653.8Q4769.4 613.3 4817.9 589.8Q4866.4 566.3 4934.4 566.3Q5002.4 566.3 5050.9 589.8Q5099.4 613.3 5128.4 655.3Q5157.4 697.3 5165.9 752.3Q5174.4 807.3 5163.4 871.3L4836.4 876.4Q4840.5 935.3 4862.4 965.3Q4889.4 1002.3 4945.4 1002.3Q4969.4 1002.3 4985.4 996.3Q5001.4 990.3 5011.4 978.8Q5021.4 967.3 5025.4 950.8Q5029.4 934.3 5028.4 913.3L5176.4 921.3Q5179.4 954.3 5169.9 989.3Q5160.4 1024.3 5134.4 1054.3Q5108.4 1084.3 5061.9 1103.3Q5015.4 1122.3 4944.4 1122.3ZM1884.4 1108.3L1884.4 972.3L2135.4 716.3L2135.4 710.3L1889.4 710.3L1889.4 580.3L2324.4 580.3L2324.4 717.3L2073.4 974.3L2073.4 978.3L2327.4 978.3L2327.4 1108.3ZM2367.4 1108.3L2367.4 972.3L2618.4 716.3L2618.4 710.3L2372.4 710.3L2372.4 580.3L2807.4 580.3L2807.4 717.3L2556.4 974.3L2556.4 978.3L2810.4 978.3L2810.4 1108.3ZM1678.4 1108.3L1678.4 580.3L1840.4 580.3L1840.4 1108.3ZM1248.4 978.3L1370.4 978.3Q1421.4 978.3 1449.4 959.8Q1477.4 941.3 1477.4 907.3Q1477.4 869.3 1445.9 850.8Q1414.4 832.3 1351.4 832.3L1248.4 832.3ZM3738.4 978.3L3860.4 978.3Q3911.4 978.3 3939.4 959.8Q3967.4 941.3 3967.4 907.3Q3967.4 869.3 3935.9 850.8Q3904.4 832.3 3841.4 832.3L3738.4 832.3ZM1248.4 722.3L1335.4 722.3Q1392.4 722.3 1422.4 703.3Q1452.4 684.3 1452.4 647.3Q1452.4 612.3 1425.4 594.8Q1398.4 577.3 1344.4 577.3L1248.4 577.3ZM3738.4 722.3L3825.4 722.3Q3882.4 722.3 3912.4 703.3Q3942.4 684.3 3942.4 647.3Q3942.4 612.3 3915.4 594.8Q3888.4 577.3 3834.4 577.3L3738.4 577.3ZM1758.4 542.3Q1712.4 542.3 1687.9 522.8Q1663.4 503.3 1663.4 466.3Q1663.4 428.3 1687.9 408.8Q1712.4 389.3 1758.4 389.3Q1805.4 389.3 1829.9 409.3Q1854.4 429.3 1854.4 466.3Q1854.4 502.3 1829.9 522.3Q1805.4 542.3 1758.4 542.3ZM4314.7 788.1L4495.7 784.6Q4494.8 770.1 4491.9 757.8Q4484.4 726.3 4464.4 709.8Q4444.4 693.3 4409.4 693.3Q4372.4 693.3 4350.4 712.3Q4328.4 731.3 4319.4 765.8Q4316.7 776.3 4314.7 788.1ZM4839.7 788.1L5020.7 784.6Q5019.8 770.1 5016.9 757.8Q5009.4 726.3 4989.4 709.8Q4969.4 693.3 4934.4 693.3Q4897.4 693.3 4875.4 712.3Q4853.4 731.3 4844.4 765.8Q4841.7 776.3 4839.7 788.1Z"/></svg></a>
+        <p>AI employees for busy service businesses. Real people stay in charge.</p>
+        <a class="btn btn-honey" href="book.html">Book a 20-minute call</a></div>
+      <div class="foot-cols">
+        <div><h4>The hive</h4><ul><li><a href="bea.html">Bea, front desk</a></li><li><a href="miles.html">Miles, follow-up</a></li><li><a href="ruby.html">Ruby, scheduling</a></li><li><a href="june.html">June, reviews</a></li><li><a href="otis.html">Otis, billing</a></li><li><a href="penny.html">Penny, marketing</a></li><li><a href="hive.html">Meet the hive</a></li></ul></div>
+        <div><h4>Industries</h4><ul><li><a href="roofing.html">Roofing</a></li><li><a href="hvac.html">HVAC</a></li><li><a href="plumbing.html">Plumbing</a></li><li><a href="electrical.html">Electrical</a></li><li><a href="auto-body.html">Auto body and collision</a></li><li><a href="dental.html">Dental practices</a></li><li><a href="med-spa.html">Med spas</a></li><li><a href="insurance.html">Insurance agencies</a></li><li><a href="property-management.html">Property management</a></li></ul></div>
+        <div><h4>Company</h4><ul><li><a href="how-it-works.html">How it works</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="trust.html">Trust and AI</a></li><li><a href="index.html#try">Try Bea live</a></li><li><a href="book.html">Book a call</a></li></ul></div>
+        <div><h4>Legal</h4><ul><li><a href="privacy.html">Privacy</a></li><li><a href="terms.html">Terms</a></li><li><a href="mailto:hello@thinkabstrakt.com">hello@thinkabstrakt.com</a></li></ul></div>
+      </div>
+    </div>
+    <div class="legal"><span>&copy; 2026 Bizzy Bee</span><span>Demos use sample data and sample businesses.</span></div>
+  </div>
+</footer>
+<script>window.BB = { api: "", app: "https://claude.ai/artifact/CuP2koKJcNLm54vViX4yBC" };</script>
+<script src="assets/site.js"></script>
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------------- hero demo (scripted mode)
+  var S = [
+    { icon: 'phone', title: 'Incoming call', sub: '(214) 555-0187 &middot; New caller, Plano', time: true, steps: [
+      ['sys', 'Bea picked up in 2 seconds'],
+      ['them', "Hi, I think I've got a leak over the garage after last night's storm."],
+      ['bee', 'Sorry to hear that. I can get an inspector out tomorrow at 10:30, or Thursday at 2. Which works better?'],
+      ['them', 'Tomorrow at 10:30.'],
+      ['bee', "You're booked. You'll get a text tonight with your inspector's name."],
+      ['res', 'Booked &middot; Tue 10:30 AM &middot; on the calendar']] },
+    { icon: 'msg', title: 'New website lead', sub: 'Dana R. &middot; Full roof replacement quote', label: 'Replied in 38 s', steps: [
+      ['sys', 'Form came in at 9:41 PM'],
+      ['bee', "Hi Dana, this is Miles, Harper Roofing's AI assistant. Thanks for the quote request! Is the house one story or two?"],
+      ['them', 'Two story, about 2,400 sq ft.'],
+      ['bee', 'Got it. Our estimator can measure Thursday at 9 or Friday at 1. Want one of those?'],
+      ['them', 'Friday works.'],
+      ['res', 'Estimate set &middot; Fri 1:00 PM']] },
+    { icon: 'doc', title: 'Invoice #1042', sub: 'Mark H. &middot; Henderson re-roof', label: '$8,640', steps: [
+      ['sys', 'Crew marked the job done, 4:12 PM'],
+      ['bee', 'Hi Mark, your invoice for the re-roof is ready: $8,640. You can pay by card or bank transfer at the link.'],
+      ['sys', 'Three days later'],
+      ['bee', 'Quick reminder that invoice #1042 is due Friday. Reply here with any questions.'],
+      ['them', 'Paid it just now, thanks!'],
+      ['res', 'Paid &middot; $8,640']] }
+  ];
+  var ICON = {
+    phone: '<path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A15 15 0 013 6a2 2 0 012-2z"/>',
+    msg: '<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/>',
+    doc: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>'
+  };
+  var tabs = [].slice.call(document.querySelectorAll('.dtab'));
+  var thread = document.getElementById('thread');
+  var dIcon = document.getElementById('dIcon'), dTitle = document.getElementById('dTitle'), dSub = document.getElementById('dSub'), dTime = document.getElementById('dTime');
+  var timers = [], clock = null, sec = 0, raf = null, cur = 0;
+
+  function clear() { timers.forEach(clearTimeout); timers = []; clearInterval(clock); cancelAnimationFrame(raf); }
+  function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+  function bubble(kind, html) {
+    var d = document.createElement('div'); d.className = 'm in ' + kind; d.innerHTML = html; thread.appendChild(d);
+    while (thread.children.length > 7) thread.removeChild(thread.firstChild);
+    return d;
+  }
+  function play(i) {
+    clear(); cur = i;
+    var s = S[i];
+    tabs.forEach(function (t, j) {
+      t.classList.toggle('on', j === i); t.setAttribute('aria-selected', j === i ? 'true' : 'false');
+      t.classList.toggle('done', j < i);
+      t.querySelector('.bar i').style.width = j < i ? '100%' : '0';
+    });
+    dIcon.innerHTML = '<svg viewBox="0 0 24 24">' + ICON[s.icon] + '</svg>';
+    dTitle.innerHTML = s.title; dSub.innerHTML = s.sub;
+    thread.innerHTML = '';
+    sec = 0;
+    if (s.time) { dTime.textContent = '0:00'; clock = setInterval(function () { sec++; dTime.textContent = Math.floor(sec / 60) + ':' + ('0' + sec % 60).slice(-2); }, 1000); }
+    else dTime.textContent = s.label;
+    var t = 500;
+    s.steps.forEach(function (st) {
+      var kind = st[0], text = st[1];
+      if (kind === 'them') {
+        later(function () { var d = bubble('them', '<span class="dots"><i></i><i></i><i></i></span>'); later(function () { d.innerHTML = text; }, 900); }, t);
+        t += 900 + 700 + text.length * 12;
+      } else if (kind === 'bee') {
+        later(function () {
+          var d = bubble('bee', ''); var n = 0;
+          (function type() { n += 2; d.textContent = text.slice(0, n); if (n < text.length) later(type, 16); })();
+        }, t);
+        t += 700 + text.length * 8 + 900;
+      } else {
+        later(function () { bubble(kind, text); }, t);
+        t += kind === 'res' ? 2600 : 900;
+      }
+    });
+    var total = t, start = performance.now(), bar = tabs[i].querySelector('.bar i');
+    (function tick(now) { var p = Math.min(1, (now - start) / total); bar.style.width = (p * 100) + '%'; if (p < 1) raf = requestAnimationFrame(tick); })(start);
+    later(function () { play((i + 1) % S.length); }, total);
+  }
+  tabs.forEach(function (t, j) { t.addEventListener('click', function () { play(j); }); });
+  if (!reduce) later(function () { play(0); }, 1400);
+  // the live demo (assets/bea-live.js) pauses and resumes this one
+  window.BBDemo = { stop: clear, resume: function () { play(cur); }, setHead: function (icon, title, sub, label) {
+    dIcon.innerHTML = '<svg viewBox="0 0 24 24">' + ICON[icon] + '</svg>'; dTitle.innerHTML = title; dSub.innerHTML = sub; dTime.textContent = label || ''; } };
+
+  // ---------------- statement: words light up as you scroll
+  var st = document.getElementById('statement');
+  (function wrap(node, hl) {
+    [].slice.call(node.childNodes).forEach(function (n) {
+      if (n.nodeType === 3) {
+        var frag = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(function (w) {
+          if (!w) return;
+          if (/^\s+$/.test(w)) { frag.appendChild(document.createTextNode(w)); return; }
+          var s = document.createElement('span'); s.className = 'w' + (hl ? ' hl' : ''); s.textContent = w; frag.appendChild(s);
+        });
+        node.replaceChild(frag, n);
+      } else if (n.nodeType === 1) { wrap(n, n.classList.contains('hl')); }
+    });
+  })(st, false);
+  var words = [].slice.call(st.querySelectorAll('.w'));
+  var steps = [].slice.call(document.querySelectorAll('#steps li'));
+  var stepsBox = document.getElementById('steps');
+  var prog = document.getElementById('prog');
+  function onScroll() {
+    if (reduce) return;
+    var vh = innerHeight;
+    var r = st.getBoundingClientRect();
+    var p = Math.max(0, Math.min(1, (vh * .85 - r.top) / (r.height + vh * .25)));
+    var lit = Math.round(p * words.length);
+    words.forEach(function (w, i) { w.classList.toggle('dim', i >= lit); });
+    var sr = stepsBox.getBoundingClientRect();
+    var q = Math.max(0, Math.min(1, (vh * .9 - sr.top) / (sr.height + vh * .25)));
+    prog.style.setProperty('--p', q.toFixed(3));
+    steps.forEach(function (li, i) { li.classList.toggle('lit', q >= (i + .5) / steps.length || q >= .98); });
+  }
+  addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll); onScroll();
+})();
+</script>
+<script type="module" src="assets/bea-live.js"></script>
+</body>
+</html>
